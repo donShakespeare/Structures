@@ -2,7 +2,7 @@
  border dashed 2 4 1, 2 4 1, 2 4 1 */
 
 /* Modify MODX just a little tiny bit */
-#modx-abtn-cancel,#modx-abtn-help,#modx-abtn-save,#modx-resource-content,#modx-panel-resource .x-tool.x-tool-toggle {
+#modx-abtn-help,#modx-abtn-save,#modx-resource-content,#modx-panel-resource .x-tool.x-tool-toggle {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important
@@ -90,7 +90,6 @@ overflow-x: hidden!important;
 }
 
 /* ^^^ Structures environment */
-
 
 
 /* External TinyMCE Ace plugin */

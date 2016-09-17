@@ -46,7 +46,7 @@ tinymce.init({
   //document_base_url: MODx.config.site_url+"assets/",
   document_base_url: MODx.config.site_url,
   link_list:[
-  [[$TinymceWrapperLinkList]]
+  [[-$TinymceWrapperLinkList]]
   ],
   link_class_list: [
     {title: 'None', value: ''},
@@ -62,7 +62,7 @@ tinymce.init({
   browser_spellcheck: true,
   gecko_spellcheck: true,
   plugins: "structures bubbleBar modxMagicHoverLink code twPreCodeManager table media imagetools contextmenu save paste image link searchreplace hr",
-  toolbar: "bold italic link image blockquote bullist numlist outdent indent hr styleselect",
+  toolbar: "bold italic link image blockquote bullist numlist table hr styleselect",
   style_formats: [{
     title: "Normal text",
     block: "p"

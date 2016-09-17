@@ -230,7 +230,7 @@ function tinyBlocksRapidImage(blobInfo, success, failure) {
     // }
   }
 }
-function tinyBlocksGear(){
+function tinyBlocksToolsMenu(){
   $(".mce-tinyBlocksTools").prependTo("#tinyBlocksControlButtonsWrapper").hide();
   tinyBlocksMouseHoverTraffic = 0;
 }
@@ -247,7 +247,7 @@ function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapper
       if(btn == "ok"){
         tinyBlocksThrobber(1);
         setTimeout(function(){
-          tinyBlocksGear();
+          tinyBlocksToolsMenu();
           if(tbTHC_ui.length){
             tbTHC_ui.find(".mce-content-body").each(function() {
               $(this).tinymce().remove();
@@ -289,6 +289,7 @@ function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapper
 // *******
 
 function tinyBlocksImport(status) {
+  tinyBlocksToolsMenu();
   tinyBlocksThrobber(1);
   setTimeout(function(){
     var content = document.getElementById(tinyBlocksMainWrapperId+"_HTML").value;
@@ -438,7 +439,7 @@ function tinyBlocksRawCode() {
 function tinyBlocksDuplicate() {
   var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass");
   if(thisRow){
-    tinyBlocksGear();
+    tinyBlocksToolsMenu();
     $(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
     var thisClone = thisRow.clone(true, true);
     var tlb = thisClone.find(".tb-wrapper-tlb");
@@ -465,7 +466,7 @@ function tinyBlocksDelete(){
     var ind = thisRow.index()+1;
     var rowAction = function(btn) {
       if(btn == "ok"){
-        tinyBlocksGear();
+        tinyBlocksToolsMenu();
         thisRow.find(".mce-content-body").each(function() { $(this).tinymce().remove();});
         thisRow.fadeOut().delay(500).remove();
         tinyBlocksLoneOrNoBlock();
@@ -500,7 +501,7 @@ function tinyBlocksUpAndDown(direction){
   thisRow.addClass("ui-selected");
   var prev = thisRow.prev();
   var next = thisRow.next();
-  // tinyBlocksGear();
+  // tinyBlocksToolsMenu();
   $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
   if(direction == "ArrowUp" && prev.length){
     thisRow.insertBefore(prev);
@@ -537,6 +538,7 @@ function tinyBlocksKeyBoard(){
       },
       'h': tinyBlocksGuide,
       'm': tinyBlocksShowHTML,
+      'i m': tinyBlocksImport,
       'a': function() {
         $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowTempHolderClass").addClass("ui-selected");
       },
@@ -743,7 +745,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
             opacity: 0.85,
             start: function(event, ui){
               tinyBlocksClickReady = 0;
-              // tinyBlocksGear();
+              // tinyBlocksToolsMenu();
               $("body").addClass('ui-drag');
               visibleLi  = $('.tinyBlocksRowTempHolderClass.ui-selected').length;
               visibleSelected  = $(".ui-selected:visible").length;
@@ -819,7 +821,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
           cursorAt: {top:15},
           scroll: false,
           start:function(event,ui){
-            tinyBlocksGear();
+            tinyBlocksToolsMenu();
             $(".tinyBlocksRowsWrapperClass .ui-selected").removeClass("ui-selected");
             $("body, #blockSnippetBar").addClass('ui-drag');
             tinyBlocksClickReady = 0;
@@ -906,7 +908,6 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         {
           icon: false,
           text: "Quick Insert",
-          tooltip: "(Ctrl + Shift + 1 - 9)",
           classes: "tb-block-shortcut",
           menu: tinyBlocksShortcut
         }
