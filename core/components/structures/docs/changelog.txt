@@ -1,0 +1,40 @@
+Changelog file for Structures extra.
+
+# Structures 2.0.0-beta2 (September 18, 2016)
+=======================================
+The first release was a mere teaser. Folks, welcome to Structures - one month old!
+
+# List of exciting features
+
++ Ability to use Structures to do exactly what you used to do before (new feature - pureContent)
++ Complete intuitive Keyboard shortcut control
++ Addition of two new brilliant themes: Lector and Slate
++ Support for ANY HTML Markup (with refined simplicity)
++ Click or Drag n' Drop from Structures Tree into content
++ Smooth and sleek sorting.
++ Single/Multiple selecting of structures - for rapid management
++ Selective or Complete Clear All
++ Each structure can now have a title
+
+# Beyond Awesome
+
++ *Ace* with all its power has been introduced to cater for Markdown syntax highlighting.
++ *Auto Import* of any content to be broken up into several structures or simply compiled into one. Do it manually, or simply open the resource (auto structured and saved) ... voila!
++ *Auto Upload on Image Data Paste or Drag n' Drop* this is pure awesome, period! From clipboard to server in milliseconds ...
+
+
+# Roadmap
+
++ Search/categorize structures - with goto/sendto functionality
++ Complete frontend solution
++ Detail github wiki page
++ Create more fantastic themes for MODX - powered by Structures
++ Create ready-made chunks of HTML structures and editor settings
++ Utilize the power of PHP domdocument in snippet
++ Extend Markdown Parser
+
+
+# Structures 1.0.0-beta (August 9, 2016)
+=======================================
+
+- Initial release

@@ -1,0 +1,47 @@
+st_aceInnerInit = function() {
+  var inner = {
+    maxLines: Infinity,
+    mode: "ace/mode/markdown",
+    wrap: "free",
+    showPrintMargin: false,
+    displayIndentGuides :true,
+    highlightActiveLine : false,
+    showGutter : false,
+    fontSize: 15,
+    tabSize: 2,
+    useWorker: false
+  }
+  return inner;
+};
+
+
+var aceTempDiv =
+  $('<div>', {
+    'id': 'ace_wrapper_'+originalTextareaId,
+    'class': 'ace_wrapper_modx tinyBlocksCE',
+    'data-ace': 'ace_id_'+originalTextareaId,
+    'data-origin': originalTextareaId,
+    'data-mode': "markdown",
+    'data-maxL': "Infinity",
+    'data-wrap': "free"
+  }).prepend(
+    // $('<span>', {
+    //   'class': 'aceKitchenSink',
+    //   'text': "markdown"
+    // }),
+    $('<div>', {
+      'id': 'ace_id_'+ originalTextareaId,
+      'width': "auto",
+      'data-origin': originalTextareaId
+    })
+  ).hide().insertBefore($("#"+originalTextareaId));
+var aceEditor = ace.edit("ace_id_"+ originalTextareaId);
+aceEditor.$blockScrolling = Infinity;
+aceEditor.setOptions(st_aceInnerInit());
+// aceEditor.renderer.setShowGutter(false);
+// aceEditor.setHighlightActiveLine(false);
+aceEditor.getSession().setValue(document.getElementById(originalTextareaId).value);
+$('#ace_wrapper_'+originalTextareaId).delay(100).fadeIn();
+aceEditor.on("change",function(){
+  document.getElementById(originalTextareaId).value = aceEditor.getValue();
+});

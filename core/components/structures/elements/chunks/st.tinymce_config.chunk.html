@@ -1,0 +1,200 @@
+/*
+Editor Legend. Simply give your element one of these purely functional classnames below
+.tb-tiny-fc = Full Content
+.tb-tiny-dc = Demo Code
+.tb-tiny-im = Image
+.tb-tiny-hd = heading
+.tb-tiny-rc is reserved for Ace and CodeMirror
+if you create more, please stick with two letters after tb-tiny-   ... for cleanup on webrender
+
+You may add classes for mgr styling purposes (without dot) or extra functionality
+Use prefix: tb-custom-
+  addClasses:{
+    toParent: "tb-custom-myStuff", //adds class(es) to the parent of your editor
+    toSelf: "tb-custom-myEditor tb-custom-self" //adds class(es) to the editor itself
+  }
+*/
+
+
+// Default settings for full RText structure
+tinymce.init({
+  selector: "[[+tinyBlocksMainWrapperId]] .tb-tiny-fc",
+  mode: "exact",
+  addClasses:{
+    toParent: "tb-custom-fc-parent",
+    toSelf: "tb-custom-fc"
+  },
+  inline: true,
+  fixed_toolbar_container: "#tinymceWrapperBubbleBar",
+  skin_url: "[[++assets_url]]components/structures/tinymceskins/stNirvana",
+  save_onsavecallback: tinyBlocksSave,
+  hidden_input: false,
+  paste_data_images: true,
+  images_upload_base_path: '[[++assets_url]]components/structures/uploads/',
+  images_upload_credentials: true,
+  images_upload_handler: tinyBlocksRapidImage,
+  tbRapidImageSettings:{
+    uploadScriptUrl: "[[++assets_url]]components/structures/rapidimage/tinyBlocksRapidImage.php",
+    uploadPath: "../", //relative to uploadScriptUrl
+    uploadUrl: "[[++assets_url]]components/structures/"  //web url to uploadPath
+  },
+  media_live_embeds:true,
+  save_enablewhendirty: false,
+  file_browser_callback: autoFileBrowser,
+  relative_urls: false,
+//  remove_script_host: false,
+  //document_base_url: MODx.config.site_url+"assets/",
+  document_base_url: MODx.config.site_url,
+  link_list:[
+  [[$TinymceWrapperLinkList]]
+  ],
+  link_class_list: [
+    {title: 'None', value: ''},
+    {title: 'prettyLink', value: 'prettyLink'},
+    {title: 'colorBox', value: 'colorBox'}
+  ],
+  image_class_list: [
+    {title: 'None', value: ''},
+    {title: 'prettyPhoto', value: 'prettyPhoto'},
+    {title: 'colorBox', value: 'colorBox'}
+  ],
+  image_caption: true,  
+  browser_spellcheck: true,
+  gecko_spellcheck: true,
+  plugins: "structures bubbleBar modxMagicHoverLink code twPreCodeManager table media imagetools contextmenu save paste image link searchreplace hr",
+  toolbar: "bold italic link image blockquote bullist numlist outdent indent hr styleselect",
+  style_formats: [{
+    title: "Normal text",
+    block: "p"
+  },{
+    title: "Pre",
+    block: "pre"
+  },{
+    title: "Code",
+    inline: "code"
+  },{
+    title: "H1",
+    block: "h1"
+  },{
+    title: "H2",
+    block: "h2"
+  },{
+    title: "H3",
+    block: "h3"
+  },{
+    title: "H4",
+    block: "h4"
+  },{
+    title: "H5",
+    block: "h5"
+  },{
+    title: "H6",
+    block: "h6"
+  }],
+  // object_resizing: false,
+  menubar: false,
+  contextmenu: "twPreCodeManager rapidImage code undo redo bold italic link unlink image removeformat",
+  valid_elements: "-*[*]", //leave to user
+    formats: {
+    insertparagraph: {
+      block: "p"
+    },
+    alignleft: {
+      selector: "p,h2,h3,",
+      classes: "text-align-left"
+    },
+    aligncenter: {
+      selector: "p,h1,h2,h3,",
+      classes: "text-align-center"
+    },
+    alignright: {
+      selector: "p,h2,h3,",
+      classes: "text-align-right"
+    }
+  }
+});
+
+// Demo Code structure settings
+tinymce.init({
+  selector: "[[+tinyBlocksMainWrapperId]] .tb-tiny-dc",
+  addClasses:{
+    toParent: "tb-custom-dc-parent",
+    toSelf: "tb-custom-dc"
+  },
+  inline: true,
+  fixed_toolbar_container: "#tinymceWrapperBubbleBar",
+  skin_url: "[[++assets_url]]components/structures/tinymceskins/stNirvana",
+  save_onsavecallback: tinyBlocksSave,
+  hidden_input: false,
+  forced_root_block : "",
+  force_br_newlines : false,
+  force_p_newlines : false,
+  valid_elements: "pre[*],code[*]",
+  valid_children: "pre[code]",
+  plugins: "structures twPreCodeManager save",
+  twPreCodeManagerSettings: {
+    managerPREcss: false, //default is true
+  },
+  toolbar: false,
+  menubar: false
+});
+
+// Markdown editor  settings
+tinymce.init({
+  selector: "[[+tinyBlocksMainWrapperId]] .tb-tiny-md",
+  addClasses:{
+    toParent: "tb-custom-md-parent",
+    toSelf: "tb-custom-md"
+  },
+  fixed_toolbar_container: "#tinymceWrapperBubbleBar",
+  inline: true,
+  skin_url: "[[++assets_url]]components/structures/tinymceskins/stNirvana",
+  save_onsavecallback: tinyBlocksSave,
+  file_browser_callback: autoFileBrowser,
+  hidden_input: false,
+  browser_spellcheck: true,
+  gecko_spellcheck: true,
+  toolbar: "preview link boldMD italicMD imageMD blockquoteMD",
+  menubar: false,
+  //contextmenu: "preview link twPreCodeManager boldMD italicMD imageMD blockquoteMD codeMD numlistMD bullistMD",
+  contextmenu: "twPreCodeManager blockquoteMD numlistMD bullistMD",
+  forced_root_block : "",
+  force_br_newlines : true,
+  force_p_newlines : false,
+  valid_elements: "br",
+  paste_as_text: true,
+  plugins: "structures bubbleBar twPreCodeManager twExoticMarkdownEditor modxMagicHoverLink paste code contextmenu save searchreplace",
+  twExoticMarkdownEditorSettings: {
+    addClass: false,
+    removeClasses: "tt-hidden tt-duplicate",
+    skipClass: "tt-duplicate",
+    addAttr: true
+  }
+});
+
+// Image structure settings
+tinymce.init({
+  selector: "[[+tinyBlocksMainWrapperId]] .tb-tiny-im",
+  addClasses:{
+    toParent: "tb-custom-im-parent",
+    toSelf: "tb-custom-im"
+  },
+  inline: true,
+  skin_url: "[[++assets_url]]components/structures/tinymceskins/stNirvana",
+  save_onsavecallback: tinyBlocksSave,
+  hidden_input: false,
+  plugins: "structures save image",
+  forced_root_block : "",
+  force_br_newlines : false,
+  force_p_newlines : false,
+  valid_elements: "-img[!class:img-responsive|!alt=image_alt|!src=about:blank]",
+  toolbar: false,
+  menubar: false,
+  file_browser_callback: autoFileBrowser,
+    relative_urls: false,
+//  remove_script_host: false,
+  document_base_url: MODx.config.site_url+"assets/",
+  image_dimensions: false,
+  paste_data_images: true,
+  object_resizing : false
+});

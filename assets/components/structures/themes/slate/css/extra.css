@@ -1,0 +1,32 @@
+.content pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+/* 
+.dark-box{
+  display:none;
+}
+
+.content>h1,.content>h2,.content>h3,.content>h4,.content>h5,.content>h6,.content>p,.content>table,.content>ul,.content>ol,.content>aside,.content>dl {
+    margin-right:0%;
+}
+.content pre,.content blockquote {
+    margin: 0;
+    width: 100%;
+    float: none;
+    clear: none;
+} */
+
+.content .search-highlight {
+    padding: 2px;
+    margin: -2px;
+    border-radius: 4px;
+    border: 1px solid rgb(14, 14, 14);
+    background: rgb(255, 255, 0);
+}
+
+.content hr {
+    margin: 2em 0;
+    border-top: 0.1px dashed rgba(57, 57, 57, 0.22);
+    border-bottom: 0.2px dashed rgba(234, 242, 246, 0.22);
+}

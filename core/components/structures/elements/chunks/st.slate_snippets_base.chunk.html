@@ -1,0 +1,45 @@
+<!-- ***
+Editor Legend. 
+Simply give your element one of these purely functional classnames below (of course you can add to the list)
+.tb-tiny-fc = Full Content
+.tb-tiny-dc = Demo Code
+.tb-tiny-im = Image
+.tb-tiny-hd = heading
+.tb-tiny-rc is reserved for Ace and CodeMirror
+SEE chunk st.tinymce_config for corresponding editor settings 
+
+You must add this class, tb-wrapper-tlb, to your tlb(Top Level Block)
+It's okay if your tlb is the same element you wish to be editable
+
+Optional: use data-tb-title attribute in your tlb to describe each structure
+
+The value of data-block must be the exact value as the corresponding data-tinyblockssnippet in st.snippets_launcher chunk
+*** -->
+
+
+<div data-block="ace" class="tb-wrapper-tlb tb-tiny-rc content" data-tb-title="Awesome Ace Markdown Editor"># Ace Markdown Editor
+
+**Lorem** Ipsum is _simply_ dummy text of the printing and typesetting [industry](example.com). Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
+
+<div data-block="richtext" class="tb-wrapper-tlb tb-tiny-fc content" data-tb-title="Wonderful Rich Text Editor"><h1>RichText Editor</h1><strong>Lorem</strong> Ipsum is <em>simply</em> dummy text of the printing and typesetting <a href="http://www.example.com">industry</a>. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
+
+<div data-block="markdown" class="tb-wrapper-tlb tb-tiny-md content" data-tb-title="Unbelievable Rich Markdown Editor"># 'Rich' Markdown Editor
+
+**Lorem** Ipsum is _simply_ dummy text of the printing and typesetting [industry](example.com). Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</div>
+
+<div data-block="code" class="tb-wrapper-tlb tb-tiny-dc content" data-tb-title="Magical Code Display">
+  <pre><code>/* Source Code */</code></pre>  
+</div>
+
+<div data-block="markdown_table" class="tb-wrapper-tlb tb-tiny-md content" data-tb-title="Pro Markdown Table"># Markdown Table
+
+| First_Header  | Second_Header | Third_Header |
+| ------------- | ------------- | ------------ |
+| Content_Cell  | Content_Cell  | Content_Cell |
+| Content_Cell  | Content_Cell  | Content_Cell |
+| Content_Cell  | Content_Cell  | Content Cell |
+</div>
+
+<div data-block="image" class="tb-wrapper-tlb tb-tiny-im content" data-tb-title="Wowzers Image">
+  <img src="[[++site_url]]assets/components/structures/img/structures-ph-460x70.jpg" alt="">  
+</div>

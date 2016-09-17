@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="[[++cultureKey]]">
+
+<head>
+  <!-- Required meta tags always come first -->
+  <meta charset="[[++modx_charset]]">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[[*pagetitle]][[*longtitle:notempty=`: [[*longtitle]]`]] </title>
+  <meta name="description" content="[[*description]]">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="//maxcdn.bootstrapcdn.com">
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="//ssl.google-analytics.com">
+  <!-- <base href="[[++site_url]]"> problematic for anchor links and scrolltoTop-->
+  <link href="[[++assets_url]]components/structures/themes/lector/css/web.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-static-top navbar-light">
+      <a href="[[~[[*id]]? &scheme=`full`]]" class="navbar-brand" rel="home">[[*longtitle]]</a>
+      <form id="search-form" class="form-inline search-form-ghost pull-xs-right hidden-xs-down">
+        <button class="btn btn-link search-btn-ghost" type="submit" title="Search">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path fill="none" d="M19.129,18.164l-4.518-4.52c1.152-1.373,1.852-3.143,1.852-5.077c0-4.361-3.535-7.896-7.896-7.896
+              c-4.361,0-7.896,3.535-7.896,7.896s3.535,7.896,7.896,7.896c1.934,0,3.705-0.698,5.078-1.853l4.52,4.519
+              c0.266,0.268,0.699,0.268,0.965,0C19.396,18.863,19.396,18.431,19.129,18.164z M8.567,15.028c-3.568,0-6.461-2.893-6.461-6.461
+              s2.893-6.461,6.461-6.461c3.568,0,6.46,2.893,6.46,6.461S12.135,15.028,8.567,15.028z"></path>
+          </svg>
+          <span class="sr-only">Search</span>
+        </button>
+        <input class="form-control form-control-ghost" name="search" id="term" type="search" placeholder="Search &hellip;" accesskey="s">
+      </form>
+      <a href="#" data-target="#searchCollapse" class="toggle-search hidden-sm-up" data-toggle="collapse" aria-expanded="false" aria-controls="searchCollapse"><i id="searchCollapseIcon" class="icon-tt-ios-search"></i></a>      
+      <ul class="nav navbar-nav top-nav pull-sm-right hidden-xs-down">
+        <li class="nav-item active">
+          <a class="nav-link" href="[[~[[*id]]? &scheme=`full`]]">Docs <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="[[~[[*id]]? &scheme=`full`]]#authors">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://forums.modx.com/thread/100687/support-comments-for-structures#dis-post-543974">Blog</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <!-- Sidebar  -->
+  <aside class="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-header">
+      <a href="[[~[[*id]]? &scheme=`full`]]">
+        <figure class="figure logo">
+          <img src="[[++assets_url]]components/structures/themes/lector/img/structures-logo-color-2.png" width="182" alt="Tutor - The Documentation theme for MODX" class="img-fluid">
+        </figure>
+      </a>
+    </div>
+    <!-- /.Logo -->
+    <nav id="toc" role="navigation" class="sidebar-nav">
+      <ul id="toc" class="nav toc-nav"></ul>
+    </nav>
+  </aside>
+  <!-- /.Sidebar -->
+  <!-- Right column-->
+  <section class="container-fluid">
+    <div class="row">
+      <!-- Main content -->
+      <main id="content" class="content-col" data-modified="Last modified: [[*editedon:strtotime:date=`%B %e, %Y %R %p`]]">
+        [[*content:Structures]]
+        <section class="content-inner page-meta small text-muted" itemprop="dateModified" datetime="%Y-%m-%dT%H:%M:%S">
+          Last modified: [[*editedon:strtotime:date=`%B %e, %Y %R %p`]] | Powered by <a href="http://modx.com/extras/package/structures" target="_blank">Structures</a>
+        </section>
+      </main>
+      <!-- Main content -->
+    </div>
+    <!-- Back to top button -->
+    <a href="[[~[[*id]]? &scheme=`full`]]#content" role="button" class="btn btn-secondary btn-circle page-top" title="Back to Top">
+      <svg class="svg-icon svg-icon-white" viewBox="0 0 96 96">
+        <path d="M52,83.999V21.655l21.172,21.172c1.562,1.562,4.094,1.562,5.656,0c1.562-1.562,1.562-4.095,0-5.657l-28-28
+      			c-1.562-1.562-4.095-1.562-5.656,0l-28,28C16.391,37.951,16,38.974,16,39.999c0,1.023,0.391,2.047,1.172,2.828
+      			c1.562,1.562,4.095,1.562,5.656,0L44,21.655v62.344c0,2.209,1.791,4,4,4S52,86.208,52,83.999z" />
+        </path>
+      </svg>
+    </a>
+    <!-- /.Back to top button -->
+  </section>
+  <!-- /.Right column -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="[[++assets_url]]components/structures/themes/lector/js/prism.js"></script>
+  <script src="[[++assets_url]]components/structures/themes/lector/js/tocify.min.js"></script>
+  <script src="[[++assets_url]]components/structures/themes/lector/js/main.js"></script>
+</body>
+
+</html>
