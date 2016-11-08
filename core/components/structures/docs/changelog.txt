@@ -1,5 +1,64 @@
 Changelog file for Structures extra.
 
+# Structures 3.0.0-beta1 (November 8, 2016)
+=======================================
+Hi, I am Structures 3.0 - your best Content Building Tool. And I am only three months old!
+
+# List of exciting new features
+
++ SUPERB GALLERY FUNCTIONALITY
+  - one click, create gallery from File Browser
+  - one click, create gallery from File Tree
+  - one click, create gallery directly from Server
+  - you can attach a main gallery to current Resource via your TV (xtype: textarea, text, [avoid hidden xtype for now])
+  - you can attach a gallery to each block/structure via chunk from Element Tree by means of block Title tv22, ch43
+  - The onboard Gallery Manager can create real physical thumbnails for you at designated places with all kinds of size settings. /Yourfolder/thumb/ andOr /Yourfolder/thumb200x100/ andOr /Yourfolder/thumb200/ etc
+  - The Gallery can produce unlimited patterns of HTML output to fit your frontend plugins
+
++ STRUCTURES NEW BEHAVIOUR
+  - ADDED replacement to getChunk in Structures Plugin - 50% boost in speed. Note! MODX tags in *st_structures* chunk are preserved and not rendered, so is the case with many other chunks
+  - ADDED Structures Menu button, commented out the old buttons next to MODX Save/Duplicate etc buttons
+     In *st.save_buttons* chunk find `<td class="x-toolbar-cell" id="tinyBlocksButtonHolder"></td>`
+     To add a Gallery button for your client, just uncomment it in that chunk
+
+  - ADDED ability to use Structures without creating extra TABS in your Resource Content (sweeeeeeet!)
+     This was possible only for Element Tree by specifying *sidebar_tab_title* to hidden
+     Now you can specify *content_tab_title* to hidden, and Structures will use your original Content Area instead (how about that huh!?!!)
+
+  - ADDED new Structure/block: Nested Structures! (nesting is now supported - ideal for whatever).
+
+  - ADDED MarkdownE as default Markdown parser for Structures Snippet, instead of the ParsedownE. Structures Snippet classnames cleanup is highly rustic at this time.
+
+  - CHANGES to Template Properties
+     Renamed customPset to StructuresCustomPset
+     *standByStructure* : use this to provide a default structure editor to show when Resource Content is empty. Note! this will replace that HELP content that shows by default
+     *defaultGalleryTVid* : you can now bind a Resource TV to your Structures Gallery Manager (kbd = g + t)
+     *randomTips* : provide random tips for your clients to show per page-reload in Structures tree, and to pop it use (kbd = r + t)
+  - ADDED some new keyboard shortcuts: for gallery, random tip etc etc
+  - Experimentally removed default shrinking of structures/blocks on page load (tell me if you don't like it)
+
+
++ CLEAN UP (MODX Elements and Assets Files)
+  - REMOVED Slate and Lector Templates - with all respective belongings (now just Structures Template): these themes, as all other templates and thirdparty plugins, will ship independently - so roll your sleeves and start contributing!!!
+
+  - REMOVED all classname options from Template Property (but if you add them manually, the custom options will be respected)
+
+  - RENAMED TV StructuresCMR to Structures
+
+  - CONCATENATED AND MINIFIED all essential JS and CSS files. 
+     Final JS file is *structures_all.min.js* ... please build yours for advanced usage
+     Final CSS file is *structures_all.min.css*
+     tinymce_plugins.js rightfully renamed to donshakepeare_tinymce.min.js (please build yours from github.com/donShakespeare/)
+
+
++ TINYMCE UBERNESS
+  - New Official Structures skin: Hamlet, the Lovable!
+  - Updated and reworked most of my TinyMCE plugins (find them at github.com/donShakespeare/)
+  - Features tinymceBubbleBar 2.0 with multiple floating toolbars: Selection and New Line toolbars (for both RTE and MDE)
+
++ And the rest history
+
+
 # Structures 2.0.0-beta2 (September 18, 2016)
 =======================================
 The first release was a mere teaser. Folks, welcome to Structures - one month old!
