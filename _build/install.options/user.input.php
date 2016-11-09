@@ -55,17 +55,19 @@
  *
  * */
 
-$output = '<h4 style="text-align: center;">Structures<br /><br /> <span style="display: block; font-size: 12px;">You are about to redefine the way you enter content in MODX<br /><br /></span></h4>
+$output = '<h4 style="text-align: center;">Structures<br /><br /> <span style="display: block; font-size: 12px;">You are about to redefine the way you handle content in MODX<br /><br /></span></h4>
 <hr />
-<h4>1. Create a new resource and attach one of Structures\' template to it</h4>
+<h4>1. Create a new resource and attach Structures Template to it</h4>
 <br />
-<h4>2. Or use your own Template, duplicate Structures\' template so that you have all the Template Default properties</h4>
+<h4>2. Or use your own Template: duplicate Structures Template so that you have all the Template Default properties</h4>
 <br />
-<h4>3. If you already have a Template ready, simply attach Structures TV to it, and create a PropertySet anywhere in MODX. Done!</h4>
+<h4>3. If you already have your own Template, simply attach Structures hidden TV to it, and create a PropertySet anywhere in MODX. Done!</h4>
 <br>
 <h4>4. If you use RichText, don\'t forget to configure the editor first. Or just stick with Markdown :)</h4>
 <br>
-<h4>Visit Structures\' <a href="https://github.com/donShakespeare/Structures/wiki" target="_blank">Official Wiki</a></h4>
+<h4>5. Use <a href="https://modx.com/extras/package/exportelementproperties" target="_blank">ExportElementProperties</a> to better handle your properties</h4>
+<br>
+<h4>Visit Structures <a href="https://github.com/donShakespeare/Structures/" target="_blank">on Github</a></h4>
 ';
 
 return $output;

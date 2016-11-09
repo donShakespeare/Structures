@@ -1,0 +1,130 @@
+<!--
+Editor Legend. 
+Simply give your element one of these purely functional classnames below (of course you can add to the list)
+.tb-tiny-fc = Full Content
+.tb-tiny-md = Markdown (reserved)
+.tb-tiny-dc = Demo Code (reserved)
+.tb-tiny-im = Image (reserved)
+.tb-tiny-rc = Ace (reserved)
+----------------------------------
+.tb-wrapper-tlb must be added to your TLB (Top Level Block)
+----------------------------------
+.tb-unwrap - should be added to your TLB if you want it to be parentless; e.g for img or pre element
+[data-tb-title] is an optional attribute to describe your TLB (Structure Title/Heading)
+----------------------------------
+.tb-mini - add this if you want your structure to double up as a RTE template (must have innerHTML and innerText). You will be able to insert it within a RTE then drag n drop
+----------------------------------
+It's okay if your TLB is the same element you wish to be editable (tb-tiny-etc).
+----------------------------------
+NESTING: simply add several .tb-tiny-etc inside one .tb-wrapper-tlb
+----------------------------------
+[data-tinyblocks-trigger] must be exact value as the corresponding [data-tinyblocks]. You may also place all your [data-tinyblocks] in another chunk
+-->
+
+<ol>
+  <!-- <h1 title="These structures contain every editor">Standard</h1> -->
+  <li>
+    <span data-tinyblocks-trigger="ace" title="Markdown with Syntax Highlight, Emmet and assisted bullets, etc">Ace Markdown</span>
+    <div data-tinyblocks="ace" class="tb-wrapper-tlb tb-tiny-rc" data-tb-title="Ace Markdown">Ace Markdown</div>
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="markdown" title="donShakespeare's Markdown Editor with toolbar and image browser">Markdown</span>
+    <div data-tinyblocks="markdown" class="tb-wrapper-tlb tb-tiny-md" data-tb-title="Markdown">Markdown</div>
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="richtext" title="All HTML elements are allowed in here">Rich Text</span>
+    <div data-tinyblocks="richtext" class="tb-wrapper-tlb tb-tiny-fc" data-tb-title="Rich Text"><p>Rich Text</p></div>
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="image" title="Single Image Structure">Image</span>
+    <div data-tinyblocks="image" class="tb-wrapper-tlb tb-tiny-im" data-tb-title="Image">
+      <img src="about:blank" alt=" " />
+    </div>
+    <!-- <img data-tinyblocks="image" class="tb-wrapper-tlb tb-unwrap tb-tiny-im" data-tb-title="Image" src="about:blank" /> -->
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="nested" title="Nesting can hold a variety of things">Nested Structures</span>
+    <div data-tinyblocks="nested" class="tb-wrapper-tlb" data-tb-title="Nested Structures">
+      <div class="tb-tiny-fc"><p>Rich Text</p></div>
+      <div class="tb-tiny-fc"><p>Rich Text</p></div>
+      <div class="tb-tiny-md">MD Text</div>
+      <div class="tb-tiny-md">MD Text</div>
+    </div>
+  </li>
+
+
+  <li>
+    <span data-tinyblocks-trigger="gallery">Gallery</span>
+    <div data-tinyblocks="gallery" class="tb-wrapper-tlb tb-tiny-rc" data-tb-title="Gallery-ch23">A gallery can be any Chunk in your element tree; or a TV attached to this resource.
+- Just specify a correct title pattern (of ANY structure);
+- Element Abbreviation (not case sensitive) + element ID  = Ch23 or TV34
+- Use hyphen to optionally compound/suffix with other words;
+
+    My Album - Ch23
+    My Gallery Etc - Tv34
+
+- Then in a structure hover menu or main top nav, find Gallery (esc, g + 1)!
+
+Sample call for frontend display (using MIGX' getImageList)
+
+[[getImageList? 
+&offset=`1`
+&where =`{"hidden:=":"0"}`
+&sort=`[{"sortby":"index","sortdir":"ASC","sortmode":"numeric"}]`
+&value=`[[$MyTuscanHoliday]]` // for raw data or chunk
+&tvname=`MyTuscanHoliday` // for TV when not using chunk
+&tpl=`MyTuscanHoliday_tpl`
+]]
+
+*MyTuscanHoliday_tpl*
+
+`[[+folder]]` = url location of image - at this time you can use physical thumbnails: `[[+folder]]thumb200x100/`
+`[[+id]]` = image filename
+`[[+title]]` = image title extra info
+`[[+desc]]` = image description longer extra info
+`[[+tag]]` = image tag
+`[[+index]]` = image sort location
+
+<a href="[[+folder]][[+id]]" class="colorbox">
+   <img src="[[+folder]]thumb/[[+id]]" alt="[[+desc]]" />
+</a>
+    </div>
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="code" title="With possible syntax etc">Ace Source Code</span>
+    <div data-tinyblocks="code" class="tb-wrapper-tlb" data-tb-title="{{ Ace Source Code }}">
+      <pre><code class="tb-tiny-rc">// Ace Source Code</code></pre>
+    </div>
+  </li>
+  
+  <li>
+    <span data-tinyblocks-trigger="rich_code" title="donShakespeare's HTML Entitizing machine">Source Code Manager</span>
+    <div data-tinyblocks="rich_code" class="tb-wrapper-tlb tb-tiny-dc" data-tb-title="{{ Source Code - Manager }}">
+      <pre><code>// Source Code</code></pre>
+    </div>
+  </li>
+
+
+  <h1 title="These can (also) safely be inserted within other full Rich Text Structures with alt + their index number">Partials</h1>
+
+  <li>
+    <span data-tinyblocks-trigger="success">Success Aside</span>
+    <aside data-tinyblocks="success" class="tb-wrapper-tlb tb-mini tb-tiny-fc success" data-tb-title="Success"><p>Success Aside</p></aside>
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="warning">Warning Aside</span>
+    <aside data-tinyblocks="warning" class="tb-wrapper-tlb tb-mini tb-tiny-fc warning" data-tb-title="Warning"><p>Warning Aside</p></aside>
+  </li>
+
+  <li>
+    <span data-tinyblocks-trigger="notice">Notice Aside</span>
+    <aside data-tinyblocks="notice" class="tb-wrapper-tlb tb-mini tb-tiny-fc notice" data-tb-title="Notice"><p>Notice Aside</p></aside>
+  </li>
+</ol>
+<p id="tb-random-tip" class="note"></p>

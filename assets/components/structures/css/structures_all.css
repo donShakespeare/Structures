@@ -1,0 +1,130 @@
+@import "structures_mgr.css";
+
+/* Richtext CSS for Structures */
+.tb-custom-fc * {
+/*   border: 0;
+  padding: 0;
+  margin: 0;
+  background: 50% 50% no-repeat; */
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+  font-weight: 400;
+}
+.tb-custom-fc :focus {
+  outline: 0;
+}
+.tb-custom-fc b, .tb-custom-fc b *, .tb-custom-fc strong, .tb-custom-fc strong * {
+  font-weight: 700;
+}
+.tb-custom-fc ol, .tb-custom-fc ul {
+  list-style: none;
+}
+.tb-custom-fc button, .tb-custom-fc input, .tb-custom-fc input:not([type]), .tb-custom-fc input[type=color], .tb-custom-fc input[type=text], .tb-custom-fc input[type=time], .tb-custom-fc input[type=url], .tb-custom-fc input[type=week], .tb-custom-fc input[type=button], .tb-custom-fc input[type=reset], .tb-custom-fc input[type=submit], .tb-custom-fc input[type=date], .tb-custom-fc input[type=datetime], .tb-custom-fc input[type=datetime-local], .tb-custom-fc input[type=email], .tb-custom-fc input[type=month], .tb-custom-fc input[type=number], .tb-custom-fc input[type=password], .tb-custom-fc input[type=search], .tb-custom-fc input[type=tel], .tb-custom-fc pre, .tb-custom-fc select, .tb-custom-fc textarea {
+  font: inherit;
+}
+
+.st-html .tb-custom-fc {
+  font-family: Lato !important;
+  font-size: 14px;
+  color: #828282;
+}
+.st-html .tb-custom-fc h1, .st-html .tb-custom-fc h2, .st-html .tb-custom-fc h3, .st-html .tb-custom-fc h4, .st-html .tb-custom-fc h5, .st-html .tb-custom-fc h6 {
+  font-family: aileron;
+  font-weight: 200;
+  line-height: 1.4em;
+  margin: 1rem 0;
+}
+.st-html .tb-custom-fc h1 {
+  font-size: 34px;
+}
+.st-html .tb-custom-fc h2 {
+  font-size: 30px;
+}
+.st-html .tb-custom-fc h3 {
+  font-size: 26px;
+}
+.st-html .tb-custom-fc h4 {
+  font-size: 22px;
+}
+.st-html .tb-custom-fc h5 {
+  font-size: 18px;
+}
+.st-html .tb-custom-fc h6 {
+  font-size: 14px;
+}
+.st-html .tb-custom-fc p {
+  margin: 1rem 0;
+}
+.st-html .tb-custom-fc p:first-of-type, .st-html .tb-custom-fc h1:first-of-type {
+  margin-top: 0;
+}
+.st-html .tb-custom-fc ol, .st-html .tb-custom-fc ul {
+  margin-left: 15px;
+  list-style-position: outside;
+  margin-bottom: 20px;
+}
+.st-html .tb-custom-fc ol li, .st-html .tb-custom-fc ul li {
+  margin-left: 10px;
+  margin-bottom: 10px;
+  color: #828282;
+}
+.st-html .tb-custom-fc ul {
+  list-style-type: disc;
+}
+.st-html .tb-custom-fc ol {
+  list-style-type: decimal;
+}
+.st-html .tb-custom-fc a[href] {
+  text-decoration: underline;
+}
+.st-html .tb-custom-fc table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
+  border: 1px solid #aaa;
+}
+.st-html .tb-custom-fc code {
+    background: rgb(241, 241, 241);
+    padding: 0 0.4rem;
+    margin: 0 0.4rem!important;
+    color: #000!important;
+    font-style:italic!important;
+    border-radius:0.5rem;
+}
+
+.st-html .tb-custom-fc pre code {
+    background: inherit;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font-style:none;
+    border-radius:0;
+}
+
+
+.st-html .tb-custom-fc table tr:nth-child(even) {
+  background: #FAFAFA;
+}
+.st-html .tb-custom-fc table caption, .st-html .tb-custom-fc table td, .st-html .tb-custom-fc table th {
+  padding: 15px 7px;
+  font: inherit;
+}
+.st-html .tb-custom-fc table th {
+  font-weight: 400;
+  color: #6E6E6E;
+  background-position: 100% 100%;
+  background-size: 2px 10px;
+  background-repeat: no-repeat;
+}
+.st-html .tb-custom-fc table th:last-child {
+  background: 0 0;
+}
+.st-html .tb-custom-fc blockquote{
+    padding: .5rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    border-left: 0.25rem solid #eceeef;
+    line-height: 1.5;
+    color: #818a91;
+}

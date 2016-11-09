@@ -2,7 +2,7 @@
 /**
 * Resolver to connect TVs to templates for Structures extra
 *
-* Copyright 2016 by donShakespeare,treigh 
+* Copyright 2016 by donShakespeare 
 * Created on 09-07-2016
 *
  * Structures is free software; you can redistribute it and/or modify it under the
@@ -50,13 +50,13 @@ if ($object->xpdo) {
 
             $intersects = array (
                 0 =>  array (
-                  'templateid' => 'Structures-Slate',
-                  'tmplvarid' => 'StructuresCMR',
+                  'templateid' => 'default',
+                  'tmplvarid' => 'Structures',
                   'rank' => 0,
                 ),
                 1 =>  array (
-                  'templateid' => 'Structures-Lector',
-                  'tmplvarid' => 'StructuresCMR',
+                  'templateid' => 'Structures',
+                  'tmplvarid' => 'Structures',
                   'rank' => 0,
                 ),
             );

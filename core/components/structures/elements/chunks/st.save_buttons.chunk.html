@@ -2,13 +2,16 @@
 
 <td class='x-toolbar-cell' title='Rich Text Editor' data-tinyblockssnippet='rich'><span id='st-btn-rte' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>RTE</button></em></span></td>
 
-<td class='x-toolbar-cell' title='Markdown Editor' data-tinyblockssnippet='markdown'><span id='st-btn-md' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>MDE</button></em></span></td>-->
+<td class='x-toolbar-cell' title='Markdown Editor' data-tinyblockssnippet='markdown'><span id='st-btn-md' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>MDE</button></em></span></td>
 
+<td class='x-toolbar-cell' onclick='tinyBlocksShowHTML()' title='(S) - Source: Import / Convert / Debug / Disable'><span id='st-btn-st' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Source</button></em></span></td>
 
-<td class='x-toolbar-cell' onclick='tinyBlocksShowHTML()' title='Import / Convert / Debug / Disable'><span id='st-btn-st' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Misc</button></em></span></td>
+<td class='x-toolbar-cell' onclick='tinyBlocksClearAll()' title='(Del, A) - Delete all or selected / (Del, 1) - Delete current'><span id='st-btn-clear' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Delete All</button></em></span></td>
 
-<td class='x-toolbar-cell' onclick='tinyBlocksClearAll()' title='Remove all or selected structures'><span id='st-btn-clear' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Clear</button></em></span></td>
+<td class='x-toolbar-cell' onclick='tinyBlocksGuide()' title='(H) - Help / Quick guide and How To'><span id='st-btn-clear' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Help</button></em></span></td>
 
-<td class='x-toolbar-cell' onclick='tinyBlocksGuide()' title='Quick guide and How To'><span id='st-btn-clear' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Help</button></em></span></td>
+<td class='x-toolbar-cell' onclick='tinyBlocksDefaultGalleryInit()' ><span id='st-btn-clear' class='x-btn x-btn-small x-btn-icon-small-left x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Gallery</button></em></span></td>-->
+
+<td class="x-toolbar-cell" id="tinyBlocksButtonHolder"></td>
 
 <td class='x-toolbar-cell' onclick='tinyBlocksSave()'><span id='st-btn-save' class='x-btn x-btn-small x-btn-icon-small-left primary-button x-btn-noicon' unselectable='on' style='width: auto;'><em><button type='button' class='x-btn-text'>Save</button></em></span></td>

@@ -2,7 +2,7 @@
 /**
  * plugins transport file for Structures extra
  *
- * Copyright 2016 by donShakespeare,treigh 
+ * Copyright 2016 by donShakespeare 
  * Created on 09-07-2016
  *
  * @package structures
@@ -30,7 +30,7 @@ $plugins[1]->fromArray(array (
   'id' => 1,
   'property_preprocess' => false,
   'name' => 'Structures',
-  'description' => 'Structures Plugin fires on OnDocFormPrerender and only when said Resource has a MODX Template attached to $tvForCMRspecificity in this case "StructuresCMR"',
+  'description' => 'Structures Plugin fires on OnDocFormPrerender and only when said Resource has a MODX Template attached to $tvForCMRspecificity in this case "Structures" TV',
   'properties' => 
   array (
   ),

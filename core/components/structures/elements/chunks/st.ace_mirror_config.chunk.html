@@ -35,6 +35,13 @@ var aceTempDiv =
       'data-origin': originalTextareaId
     })
   ).hide().insertBefore($("#"+originalTextareaId));
+if($("#"+originalTextareaId)[0].parentNode.nodeName == "PRE" || $("#"+originalTextareaId)[0].parentNode.nodeName == "CODE"){
+  var tag = "Code";
+}
+else{
+  var tag = "MD";
+}
+$("#"+originalTextareaId).parents(".tinyBlocksRowTempHolderClass").find(".tb-name").html(tag).attr("Powered by Ace");
 var aceEditor = ace.edit("ace_id_"+ originalTextareaId);
 aceEditor.$blockScrolling = Infinity;
 aceEditor.setOptions(st_aceInnerInit());

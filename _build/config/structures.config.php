@@ -16,9 +16,9 @@ $components = array(
     'packageName' => 'Structures',  /* No spaces, no dashes */
     'packageNameLower' => $packageNameLower,
     'packageDescription' => 'A fantastic new way to enter content in MODX.',
-    'version' => '2.0.0',
-    'release' => 'beta2',
-    'author' => 'donShakespeare,treigh',
+    'version' => '3.0.0',
+    'release' => 'beta1',
+    'author' => 'donShakespeare',
     'email' => '',
     'authorUrl' => 'https://github.com/donShakespeare/Structures',
     'authorSiteName' => "Structures",
@@ -108,14 +108,6 @@ $components = array(
         'Structures' => array(
             'category' => 'Structures',
             'parent' => ''  /* top level category */
-        ),
-        'Lector' => array(
-            'category' => 'Lector',
-            'parent' => 'Structures'
-        ),
-        'Slate' => array(
-            'category' => 'Slate',
-            'parent' => 'Structures'
         )
     ) ,
 
@@ -178,12 +170,13 @@ $components = array(
     'assetsDirs' => array(
         /* If true, a default (empty) CSS file will be created */
         'css' => true,
+        'gallery' => true,
         'img' => true,
         'js' => true,
-        'themes' => true,
-        'rapidimage' => true,
         'markdown' => true,
-        'tinymceskins' => true
+        'rapidimage' => true,
+        'tinymceskins' => true,
+        'uploads' => true
     ),
     /* minify any JS files */
     'minifyJS' => false,

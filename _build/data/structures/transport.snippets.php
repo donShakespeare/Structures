@@ -2,7 +2,7 @@
 /**
  * snippets transport file for Structures extra
  *
- * Copyright 2016 by donShakespeare,treigh 
+ * Copyright 2016 by donShakespeare 
  * Created on 09-07-2016
  *
  * @package structures
@@ -30,7 +30,7 @@ $snippets[1]->fromArray(array (
   'id' => 1,
   'property_preprocess' => false,
   'name' => 'Structures',
-  'description' => 'Used to parse Markdown, and to perform other cosmetic cleanups. Usage [[*content:Structures]]... It can take these options :Structures=markdown or :Structures=markdownE or :Structures=parsedown or :Structures=parsedownE',
+  'description' => 'Used to parse Markdown, and to perform other cosmetic cleanups. Usage [[*content:Structures]]... It can take these options :Structures=markdown or :Structures=markdownE(default) or :Structures=parsedown or :Structures=parsedownE',
   'properties' => 
   array (
   ),

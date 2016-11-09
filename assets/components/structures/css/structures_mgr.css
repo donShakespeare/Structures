@@ -1,0 +1,714 @@
+/* theme color from tinymce skin .mce-panel bg rgba(45, 51, 56, 1) */
+/* Modify MODX just a little tiny bit */
+#modx-abtn-save,#ta{
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important
+}
+
+.x-panel-body.x-panel-body-noheader.x-panel-body-noborder {
+    overflow-x: hidden!important;
+}
+
+.modx-browser {
+    z-index: 99999!important;
+}
+
+#modx-header.tinyBlocksDistraction, #modx-action-buttons.tinyBlocksDistraction, #modx-resource-tabs .x-tab-panel-header.x-tab-panel-header-noborder.x-unselectable.x-tab-panel-header-plain.tinyBlocksDistraction {
+    display: none!important;
+}
+
+#modx-action-buttons.tinyBlocksDistraction,#modx-content.tinyBlocksDistraction {
+    top: 0!important;
+}
+
+#tinyBlocksSideWr .x-panel-body.x-panel-body-noheader.x-panel-body-noborder {
+    height: auto!important;
+}
+
+.x-window.x-window-plain.x-window-dlg{
+    min-width: 250px!important;
+    width: auto!important;
+}
+.x-window.x-window-plain.x-window-dlg .x-window-body{
+    width:auto!important;
+}
+
+div.tb-gallery-tv:before {
+    content: "";
+    position: absolute;
+    display: block;
+    z-index: 9;
+    width: 102%;
+    height: 100%;
+    background: rgba(242, 242, 242, 0.9);
+    text-align: center;
+    cursor: pointer;
+}
+div.tb-gallery-tv:after {
+    /* content: "Open Main Gallery - tv" attr(data-tb-tv) " (g + t)"; */
+    content: "Open Main Gallery (g + t)";
+    position: absolute;
+    display: block;
+    z-index: 9;
+    width: 200px;
+    height: 17px;
+    top:23%;
+    left:0;
+    bottom:23%;
+    right:0;
+    margin:auto;
+    background: rgba(45, 51, 56, 1);
+    color:#fff;
+    text-align: center;
+    cursor: pointer;
+    border-radius:5px;
+    padding:7px 10px;
+}
+/* ^^^ Modify MODX just a little tiny bit */
+/* Structures environment (not for rich text)*/
+.st-html {
+    /* enclose resets here */
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #55595c;
+    background-color: #fff;
+    position: relative;
+    min-height: 100%;
+    overflow: hidden !important
+}
+
+.st-html [tabindex="-1"]:focus {
+    outline: none !important
+}
+
+.st-body {
+    /* counter-reset: st-row-counter; */
+    padding: 2rem;
+}
+
+.st-container-fluid:empty::before,.st-outer::before {
+    text-align: center
+}
+
+.st-container-fluid {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0rem 4rem 10rem 4rem;
+    min-height: 20rem;
+    border: 0.2rem rgb(241, 241, 241) dashed;
+}
+
+.tb-guide {
+    max-width: 600px;
+    height: 380px;
+    display: block;
+    overflow: auto;
+}
+
+.tinyBlocksRowsWrapperClass .tb-guide {
+    padding: 0.5rem 2rem 0;
+    font-size: 1rem;
+    color: #555;
+    height: auto;
+    width: auto;
+    max-width: 100%;
+}
+
+.tb-guide p, .tb-guide li {
+    margin: 1rem 0;
+}
+
+.tb-guide li {
+    margin-left: 0.29rem;
+}
+
+.tb-guide ol {
+    list-style-type: decimal!important;
+    list-style: initial;
+    padding: 0 0 0 1rem;
+}
+
+.tb-guide kbd {
+    background: rgba(241, 241, 241, 1);
+    padding: 1px 3px;
+    border-radius: 5px;
+    color: #000;
+    font-size: 98%;
+}
+
+/* ^^^ Structures environment */
+/* External TinyMCE Ace plugin */
+.st-html .coder {
+    height: auto!important;
+    z-index: 3;
+}
+
+.st-html [data-origin] pre.ace_editor {
+    height: 300px!important;
+}
+
+/* ^^^ External TinyMCE  Ace plugin */
+/* Structures tools and stuff + menu */
+#blockControlBase, textarea.tb-tiny-rc-sub, .st-outer.tb-lone-block:before, .st-outer.tb-lone-block .tb-select, .st-outer.tb-lone-block .mce-tinyBlocksTools {
+    display: none!important;
+}
+
+#blockSnippetBar .tinyBlocksRowTempHolderClass {
+    display: none!important
+}
+
+#blockSnippetBar ol {
+    list-style-type: decimal!important;
+    list-style-position: inside!important;
+    padding: 2em 0;
+    text-align: left;
+    color: #555;
+}
+
+#blockSnippetBar ol li {
+    font-size: 0.7rem!important;
+    background-color: #fff!important;
+    border-bottom: 0.15rem rgba(241, 241, 241, 1) dashed;
+}
+
+#blockSnippetBar h1 {
+    padding: 2rem 0 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: help;
+}
+
+#blockSnippetBar [data-tinyblocks-trigger],.tb-ui-drag-helper {
+    display: block!important;
+    cursor: pointer;
+    color: inherit;
+    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-weight: 500!important;
+    line-height: 1.5!important;
+    padding: 0.3rem 0 0.2rem 1.5rem!important;
+    font-size: 1rem!important;
+    text-align: left;
+    max-width: 15rem;
+}
+
+#blockSnippetBar li.tb-onRoute, #blockSnippetBar [data-tinyblocks-trigger].tb-onRoute {
+    visibility: hidden!important;
+}
+
+.tb-ui-drag-helper {
+    position: fixed!important;
+    z-index: 999999!important;
+    border: 0.15rem rgba(241, 241, 241, 1) dashed!important;
+    background-color: #fff !important;
+    text-align: center;
+}
+
+#blockSnippetBar li:last-of-type {
+    border-bottom: 0;
+}
+
+#blockSnippetBar ol li:hover {
+    background-color: rgba(241, 241, 241, 0.5) !important;
+}
+#tb-random-tip{
+    margin: 2rem auto;
+    display: none;
+    width: 80%;
+    font-style:italic;
+}
+#tb-random-tip:before{
+    content:"Tip:";
+    display:block;
+    font-style:italic;
+    text-decoration:underline;
+}
+
+#tinyBlocksButtonHolder button {
+    padding: 7.5px!important;
+    font-style: normal !important;
+    font-size: 13px !important;
+}
+
+#tinyBlocksButtonHolder .mce-tinyBlocksButton {
+    margin: 0px 0px 0px 7px !important;
+    display: none;
+    border: 0;
+    /* background: #fff; */
+}
+
+#tinyBlocksButtonHolder .mce-txt {
+    vertical-align: middle;
+}
+
+.tinyBlocksHTMLbtn {
+    text-align:center;
+}
+
+.st-outer.tb-nested-no {
+    counter-increment: st-row-counter
+}
+
+.st-outer.tb-nested-yes {
+    counter-increment: st-row-counter-nested
+}
+
+/* .tb-lone-block .tb-ui-drag-handle{
+  display: none!important;
+} */
+.st-outer.tb-nested-no::before {
+    content: counter(st-row-counter);
+}
+.st-outer.tb-nested-yes::before {
+    content: counter(st-row-counter-nested);
+}
+.st-outer::before {
+    line-height: 0.8;
+    font-size: 0.7rem;
+    font-weight: 600;
+    vertical-align: middle;
+    background-color: rgba(241, 241, 241, 1);
+}
+
+.ui-selected.st-outer::before {
+    background-color: rgba(45, 51, 56, 1);
+    color: rgba(241, 241, 241, 1);
+}
+
+/* .tb-wrapper-tlb:focus .tb-ui-drag-handle{
+  background: #f7f7f9!important;
+} */
+.tb-spacer {
+    margin-top: 4rem!important;
+    display: block!important;
+    position: relative;
+    height: 1rem;
+}
+
+.tb-spacer:hover {
+    background: rgba(241, 241, 241, 0.15);
+}
+
+.mce-tinyBlocksTools,.tb-select, .st-outer::before {
+    position: absolute!important;
+    display: block;
+    top: 1rem!important;
+    left: -1.75rem!important;
+    width: 1.25rem!important;
+    height: 0.95rem;
+    padding-top: 0.3rem;
+    z-index: 2!important;
+    border-radius: 0.15rem;
+}
+
+.tb-select.tb-nested-no{
+    cursor: move;
+}
+
+.tb-title, .tb-name {
+    display: block!important;
+    width: 90%!important;
+    margin: auto;
+    font-size: 0.7rem!important;
+    text-align: center!important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    outline: none!important;
+}
+
+.tb-title * {
+    display: none!important;
+}
+
+.tb-name {
+    position: absolute;
+    right: 0;
+    width: auto!important;
+}
+
+/* .tb-ui-drag-handle {
+background-color: rgba(241, 241, 241, 1);
+cursor: move;
+top: 3rem;
+transition: background-color 0.10s ease-in-out;
+} */
+#blockSnippetBar.ui-drag, #blockSnippetBar.ui-drag [data-tinyblocks-trigger], body.ui-drag, body.ui-drag * {
+    cursor: move!important;
+}
+
+.st-outer {
+    position: relative;
+    padding: 0 !important;
+    margin: 0;
+}
+
+.tinyBlocksHTMLwrapper {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0rem 4rem 4rem 4rem;
+}
+
+.tinyBlocksHTML {
+    width: 95%;
+    height: 8rem;
+    background: rgba(242, 242, 242, 0.26)!important;
+    border: 0.2rem dashed rgb(241, 241, 241)!important;
+    border-top:0;
+    padding: 2%;
+    resize: vertical;
+}
+
+.mce-tinyBlocksTools {
+    top: 2.5rem !important;
+    /* background-color: rgb(241, 241, 241)!important; */
+    border: 0 !important;
+    right: -1.35rem!important;
+    cursor: pointer !important;
+}
+
+.st-outer.tb-nested-yes::before, .tb-nested-yes .mce-tinyBlocksTools, .tb-nested-yes .tb-select{
+    margin-top: -1rem;
+    left: 0!important;
+}
+
+
+.mce-tinyBlocksTools button {
+    padding: 0!important;
+}
+
+.mce-tinyBlocksTools i {
+    padding: 0!important;
+    position: absolute!important;
+    top : 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto!important;
+}
+
+.st-outer .mce-tinyBlocksTools .mce-menu-item,.tinyBlocksHTMLwrapper .mce-tinyBlocksTools .mce-menu-item {
+    padding: 0.25rem !important;
+    display: inline-block !important
+}
+
+/* contain these later */
+.mce-menu {
+    width: auto !important;
+    min-width: 100px !important;
+    border-radius: 0 !important;
+}
+
+.mce-menu,.mce-menu.mce-context-menu {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.mce-menu-item span.mce-text {
+    background-color: transparent !important
+}
+
+.mce-menu-item:hover span.mce-text {
+    background-color: transparent !important;
+    color: #fff !important
+}
+
+/* Debug styling */
+.tinyBlocksDebug {
+    position: relative;
+    background: white;
+    display: block;
+    font-weight: bold;
+    padding: 3%;
+    border-radius: 5px;
+    color: #000;
+    margin: auto;
+    height: 25px;
+    overflow: hidden;
+    word-wrap: break-word
+}
+
+.tinyBlocksDebug:hover {
+    height: auto;
+    overflow: auto
+}
+
+.tinyBlocksDebug h2,.tinyBlocksDebug .tinyBlocksDebug h3 {
+    text-align: center
+}
+
+.tinyBlocksDebug b {
+    color: #818a91
+}
+
+.tinyBlocksDebug b:after {
+    content: ": "
+}
+
+.tinyBlocksDebug i {
+    color: #28a697
+}
+
+.tinyBlocksDebug span {
+    display: block;
+    border: 2px dotted #818a91;
+    border-bottom: 0;
+    margin: 0px;
+    overflow: auto;
+    padding: 5px
+}
+
+.tinyBlocksDebug .imp {
+    background: #2b3b43
+}
+
+/* ^^^ Debug styling */
+
+#tinyBlocksThrobber {
+    display: block !important;
+    position: fixed !important;
+    width: 31px;
+    height: 31px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    opacity: .24 !important;
+    background: rgb(248, 248, 248) url("../img/loader.gif") no-repeat center center !important;
+    z-index: 99999999 !important;
+}
+
+/* ^^^ Structures tools and stuff + menu */
+/* Structures Row */
+.st-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important
+}
+
+/* ^^^ Structures Row */
+.st-shrink {
+    height: 2rem;
+    overflow: auto!important;
+    overflow-x: hidden!important;
+}
+
+.st-hidden {
+    opacity: 0.2
+}
+
+.st-new-block::before {
+    content: "New";
+    position: absolute;
+    left: 0;
+    color: rgba(45, 51, 56, 1)!important;
+    font-size: .65rem!important;
+    font-weight: 700;
+    z-index: 10;
+    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/* prevent all block images from breaking boundary from block - fix to be more specific*/
+.tb-wrapper-tlb img {
+    max-width: 100%!important;
+    /* somewhat responsive */
+    max-height: 100%!important;
+    /* somewhat responsive */
+}
+
+.mce-tinymce.mce-tinymce-inline.mce-arrow.mce-container.mce-panel.mce-floatpanel.mce-arrow-up {
+    z-index: 8900!important;
+}
+
+.st-html .mce-edit-focus {
+    outline: none !important
+}
+
+.st-html .ui-state-highlight {
+    display: block!important;
+    height: 4rem;
+    margin-top: 3rem;
+    border: 0.2rem rgba(241, 241, 241, 1) dashed;
+}
+
+.tb-nested-wrapper .ui-state-highlight {
+    margin: 1.5rem!important;
+}
+/* 
+#tinymceWrapperBubbleBar {
+    position: fixed !important;
+    opacity: 1 !important
+} */
+
+/* .mce-bubbleBar {
+    box-shadow: 0 2px 8px rgba(47,49,56,0.3) !important
+} */
+
+.st-html .mce-menu {
+    width: auto !important;
+    min-width: 100px !important;
+    border-radius: 0 !important
+}
+
+.st-html #aceMoreSuperOptions_wrapper {
+    position: absolute!important;
+    z-index: 9!important;
+    right: 2rem!important;
+    top: -0.5rem!important;
+    width: 8rem;
+}
+
+.st-html #aceMoreSuperOptions_wrapper_sub {
+    margin-top: 0!important;
+}
+
+/* ***************end ***************************************/
+.tb-wrapper-tlb, .tb-nested-yes  [class^=tb-tiny-] {
+    padding: 1rem;
+    transition: all 0.1s ease-in-out;
+    border: 0.2rem rgba(241, 241, 241, 1) dashed;
+    min-height: 3rem;
+    overflow-y: auto;
+}
+
+.tb-nested-yes  [class^=tb-tiny-]{
+    margin: 1.5rem;
+}
+
+.ui-selected .tb-wrapper-tlb, .tb-nested-yes.ui-selected [class^=tb-tiny-] {
+    border-color: rgba(45, 51, 56, 1);
+}
+
+.ui-selected .tb-wrapper-tlb:hover, .tb-nested-yes [class^=tb-tiny-]:hover {
+    border-color: rgba(45, 51, 56, 0.7);
+}
+
+.ui-selected .tb-wrapper-tlb:focus, .tb-nested-yes [class^=tb-tiny-]:focus {
+    border-color: rgba(45, 51, 56, 0.5);
+}
+
+.tb-ui-multiple-select, .tb-ui-single-select:not(.tb-ui-drag-helper) {
+    padding-top: 1rem!important;
+}
+
+.tb-ui-multiple-select .tb-spacer, .tb-ui-single-select .tb-spacer {
+    display: none!important;
+}
+
+.tb-ui-multiple-select.st-outer .tb-wrapper-tlb {
+    border-style: solid;
+    background: rgba(241, 241, 241, 1);
+}
+
+.tb-ui-multiple-select.st-outer:after {
+    content: "multiple structures";
+    display: block;
+    position: absolute;
+    background: rgba(45, 51, 56, 1)!important;
+    padding: 0 1rem;
+    color: #fff;
+}
+
+.tb-wrapper-tlb:focus,.tb-wrapper-tlb:hover, .tb-nested-yes [class^=tb-tiny-]:focus,.tb-nested-yes [class^=tb-tiny-]:hover{
+    border-color: #dfdfdf
+}
+
+/*  markdown structure */
+.tb-custom-md:empty:before,.tb-tiny-md:empty:before {
+    display: block;
+    transition: all 0.1s ease-in-out
+}
+
+.tb-custom-md {
+    transition: opacity 1s, ease-in-out;
+    position: relative;
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace !important;
+    font-size: .875rem !important;
+    line-height:normal;
+}
+.tb-custom-md p:empty, .tb-custom-md p br{
+    margin:1rem 0;
+}
+
+/* ^^^ markdown structure */
+/* ^^^ image structure */
+.tb-custom-im {
+    cursor: pointer !important;
+}
+
+.tb-custom-im img {
+    display: block;
+    max-width: none;
+    max-height: 16.875rem;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.tb-custom-im:hover img {
+    opacity: .8
+}
+
+/* ^^^ image structure */
+[class*="tb-tiny-"] {
+    word-wrap: break-word;
+}
+
+.st-html pre[contenteditable=false][data-mce-selected] {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12) !important;
+}
+
+/*  demo code structure */
+.tb-custom-dc, .tb-custom-dc *{
+    cursor: pointer!important;
+}
+
+.tb-custom-dc pre {
+    box-shadow: none !important;
+    padding: 1rem;
+    overflow: hidden;
+    outline: 0!important;
+}
+
+/* ^^^ demo code structure */
+/* .tb-custom-fc:focus, .tb-custom-md:focus {
+    cursor: text;
+} */
+.tb-custom-fc [contenteditable=false]{
+    border: 0.15rem rgb(241, 241, 241) dashed;
+    padding: 0.5rem;
+    margin:1rem 0;
+    outline:0!important;
+    border:0.15rem rgb(241, 241, 241) dashed;
+}
+.tb-custom-fc [contenteditable=false][data-mce-selected]{
+    border-color: rgb(35, 53, 73);
+}
+.tb-custom-fc [contenteditable=false],:not(*){
+    cursor: move;
+}
+.tb-custom-fc [contenteditable=false] [contenteditable=true]:hover{
+    outline-color:rgb(241, 241, 241)!important;
+}
+
+/* destroy all unwanted TinyMCE carets */
+.tb-custom-dc [data-mce-caret],.tb-custom-dc .mce-visual-caret, .tb-custom-im .mce-visual-caret {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* ^^^ destroy all unwanted TinyMCE carets */
+/* destroy all unwanted TinyMCE blue outline */
+/* .st-html [data-mce-selected] {
+    outline: none !important;
+} */
+
+/* ^^^ destroy all unwanted TinyMCE carets*/
+
+
+/* .tinyBlocksRowTempHolderClass.tb-nested-yes {
+    margin-left: 1.5rem;
+} */

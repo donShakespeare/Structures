@@ -2,7 +2,7 @@
 /**
 * Resolver to connect plugins to system events for Structures extra
 *
-* Copyright 2016 by donShakespeare,treigh 
+* Copyright 2016 by donShakespeare 
 * Created on 09-07-2016
 *
  * Structures is free software; you can redistribute it and/or modify it under the

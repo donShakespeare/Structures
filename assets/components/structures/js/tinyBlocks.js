@@ -24,7 +24,7 @@ ROADMAP
       result_selects   = result.find('select').add(result.filter('select'));
 
     for (var i = 0, l = my_textareas.length; i < l; ++i) $(result_textareas[i]).val($(my_textareas[i]).val());
-    for (var i = 0, l = my_selects.length;   i < l; ++i) {
+    for (i = 0, l = my_selects.length;   i < l; ++i) {
       for (var j = 0, m = my_selects[i].options.length; j < m; ++j) {
         if (my_selects[i].options[j].selected === true) {
           result_selects[i].options[j].selected = true;
@@ -76,26 +76,33 @@ function tinyBlocksSave(options, status){
       }
       tinyBlocksResult = $(".tinyBlocksRowsWrapperClass").clone(true, true);
       var result = $(".tinyBlocksRowsWrapperClass").clone(true, true);
-      var tinyClasses = tinyBlocksHiddenBlockClass + " " + tinyBlocksRowClass + " " + tinyBlocksNewBlockClass + " " + tinyBlocksShrinkBlockClass + " ";
+      // result.find(".tb-wrapper-tlb").each(function(){
+      //   $(this).removeClass("s-t").attr("class", "s-t " + $(this).attr("class"));
+      // });
+      var tinyClasses = tinyBlocksHiddenBlockClass + " " + tinyBlocksRowClass + " " + tinyBlocksNewBlockClass + " " + tinyBlocksShrinkBlockClass + " mceEditable";
+      // result.find(".tinyBlocksRowTempHolderClass").find(".tinyBlocksRowTempHolderClass").contents().unwrap();
       result.find("textarea.tb-tiny-rc-sub").each(function(){
+        var val;
         var parent = $(this).parents(".tb-wrapper-tlb");
         var parentSub = $(this).parents(".tb-tiny-rc");
 
         if(parentSub[0].nodeName == "PRE" || parentSub[0].nodeName == "CODE"){
-          var value = tinymce.html.Entities.encodeAllRaw($(this).val())
+          val = tinymce.html.Entities.encodeAllRaw($(this).val());
         }
         else{
           parent.attr("markdown", 1);
-          var value = $(this).val();
+          val = $(this).val();
         }
 
-        $(this).parent().html(value);
+        $(this).parent().html(val);
       });
       result.find(".tb-unwrap").each(function(){
         var tempClassNames = $(this).attr("class");
         var tempTitle = $(this).attr("data-tb-title");
         $(this).children(":first").addClass(tempClassNames).attr("data-tb-title", tempTitle).unwrap();
       });
+      result.find(".tinyBlocksRowTempHolderClass").find(".tinyBlocksRowTempHolderClass").children().not("[class*=tb-tiny-]").remove();
+      result.find(".tinyBlocksRowTempHolderClass .tinyBlocksRowTempHolderClass").contents().unwrap();
       result.find("iframe, .tb-wrapper-tlb").unwrap();
       result.html(result.children(".tb-wrapper-tlb")); //destroy surrounding stuffsss
       result.find(".tb-wrapper-tlb:not(:last)").after('\n'); //Markdown parser needs this
@@ -107,17 +114,17 @@ function tinyBlocksSave(options, status){
         $(this).attr("markdown", 1);
       });
       result.find("[id^=mce_]").removeAttr('id');
-      result.find(".tinyBlocksCE, [data-mce-bogus], [data-mce-style], .mce-shim, .coder").remove();
+      result.find(".tinyBlocksCE, [data-mce-bogus], .mce-shim, .coder").remove();
       result.find('*')
-        .removeAttr("data-tb-rapid twprecodemanagerprecss contenteditable data-mce-href data-mce-selected data-mce-src")
-        .removeClass(tinyClasses)
+        .removeAttr("data-tb-rapid twprecodemanagerprecss contenteditable data-mce-href data-mce-selected data-mce-src data-mce-style")
+        .removeClass(tinyClasses )
         .alterClass("tinyBlocks* mce-* tb-custom-*","");
       result.find('[class*="tb-tiny-"]')
         .removeAttr("spellcheck style width height contenteditable");
       result.find('[class=""]').removeAttr('class');
       var pure = result.find('.tb-tiny-pure');
       if(pure.length > 1){
-        pure.not(":first").prepend("[[-TB-MARKER]]");
+        pure.not(":first").prepend("[[-"+tinyBlocksProjectNameUC+"]]");
       }
       if(pure.length){
         pure.contents().unwrap();
@@ -140,6 +147,217 @@ function tinyBlocksSave(options, status){
   }
   else{
     tinyBlocksCustomSave();
+  }
+}
+if(typeof autoFileBrowser == "undefined" || autoFileBrowser.name == "modxNativeBrowser"){
+  autoFileBrowser = function(field_name, url, type, win, gallery) {
+    $(".modx-browser").remove();
+    var path;
+    if(url){
+      path = url.substring(0,url.lastIndexOf("/")+1); // use later
+    }
+    var w = MODx.load({
+      xtype: "modx-browser",
+      multiple: true, // true is troublesome
+      openTo:  path || MODx.config.manager_url + "index.php?a=" + MODx.action.browser + "&source=" + MODx.config.default_media_source, //remove ExtJS and MODX direct code
+      listeners: {
+        "select": {
+          fn:function(data) {
+            if(gallery == "createGal"){
+              tinymce.get("tinyJSONfield").windowManager.confirm("Use thumbnails for this Gallery View?", function(s){
+                if(s){
+                  rebuildGalleryFromMODX(data, ".modx-browser-thumb-wrap", "browser", "on");
+                }
+                else{
+                  rebuildGalleryFromMODX(data, ".modx-browser-thumb-wrap", "browser", "off");
+                }
+              });
+              // if(field_name){
+              //   var folderUrl = data.fullRelativeUrl;
+              //   if(win){
+              //     win.document.getElementById(field_name).value = folderUrl.substring(0,folderUrl.lastIndexOf("/")+1);
+              //   }
+              //   else{
+              //     document.getElementById(field_name).value = folderUrl.substring(0,folderUrl.lastIndexOf("/")+1);
+              //   }
+              // }
+            }
+            else if(gallery == "addGalFiles"){
+              var folderUrl = data.fullRelativeUrl;
+              document.getElementById(field_name).value = folderUrl.substring(folderUrl.lastIndexOf("/")+1);
+            }
+            else{
+              win.document.getElementById(field_name).value = data.fullRelativeUrl;
+            }
+            MODx.fireEvent("select",data);
+        },scope:this}
+      }
+    });
+    w.show();
+  };
+}
+function tinyBlocksGallery(origin){
+  if(typeof TinyJSONGallery == "undefined"){
+     // tinymce.get("tmpTempEditor").windowManager.alert("Error! TinyJSONGallery is not loaded");
+     return false;
+  }
+  if(origin == "begin"){
+    exitedGalleryToUseElementTree = 0;
+    tinyJSONGalleryTABtitle = tinyBlocksProjectName + " Gallery";
+    $(document).on("mouseenter", ".modx-window, .tvJSONGalleries", function () {
+      var extraTitleadd, chunkContentId;
+      if($(this).hasClass("tvJSONGalleries")){
+        if(exitedGalleryToUseElementTree == 1){
+          $(".tvJSONGalleries").parent().addClass("tvChunkGalleries-parent");
+        }
+        extraTitleadd = " TV: "+$(this).parents(".modx-tv").find(".modx-tv-caption").text();
+        chunkContentId = $(this).attr("id");
+        $(this).on("dblclick",function(){
+          if(chunkContentId && exitedGalleryToUseElementTree == 1 && !$("#tinyJSONGalleryWrapper").length){
+            popGal(chunkContentId, tinyJSONGalleryTABtitle+extraTitleadd);
+          }
+        });
+      }
+      else{
+        if(exitedGalleryToUseElementTree == 1){
+          $(this).find("textarea[name=snippet]").parents(".modx-window").addClass("tvChunkGalleries-parent");
+        }
+        $(this).find("textarea[name=snippet]:visible").addClass("chunkJSONGalleries");
+        chunkContentId = $(this).find("textarea[name=snippet]").attr("id");
+        extraTitleadd = " Chunk: "+$(this).find(".x-window-header-text > span").text(); //code eats up header title
+        // var extraTitleadd = " Chunk: "+$(this).find("input[name=name]").val();
+        $(this).find(".chunkJSONGalleries").on("dblclick",function(){
+          if(chunkContentId && exitedGalleryToUseElementTree == 1 && !$("#tinyJSONGalleryWrapper").length){
+            popGal(chunkContentId, tinyJSONGalleryTABtitle+extraTitleadd);
+          }
+        });
+      }
+    });
+  }
+  else{
+    if(origin == "on" || exitedGalleryToUseElementTree === 0){
+      exitedGalleryToUseElementTree = 1;
+      $("#modx-tv-tabs textarea:not(.modx-richtext, .tb-gallery-tv)").addClass("tvJSONGalleries").parent().addClass("tvChunkGalleries-parent");
+      if(origin == "on" && typeof globalSONGalleries == "undefined"){
+        tinymce.get("tmpTempEditor").windowManager.alert("Global Gallery ON: just dblclick chunks textarea");
+        globalSONGalleries = 1;
+      }
+      else if(origin !== "on"){
+        tinymce.get("tmpTempEditor").windowManager.alert("Global TV/Chunk Gallery ON");
+        globalSONGalleries = 1;
+      }
+    }
+    else {
+      exitedGalleryToUseElementTree = 0;
+      $(".tvJSONGalleries").removeClass("tvJSONGalleries");
+      $(".tvChunkGalleries-parent").removeClass("tvChunkGalleries-parent");
+      tinymce.get("tmpTempEditor").windowManager.alert("Global Gallery is now OFF");
+    }
+  }
+}
+function tinyBlocksGalleryGetChunk(id){
+  tinyBlocksThrobber(1);
+  MODx.Ajax.request({ // thanks to @rtripault
+    url: MODx.config.connector_url,
+    params: {
+      action: 'element/chunk/get',
+      id: id
+    },
+    listeners: {
+      'success': {
+        fn: function(r) {
+          var w = MODx.load({
+            xtype: 'modx-window-quick-update-chunk',
+            record: r.object,
+            listeners: {
+              'success': {
+                fn: function(r) {
+                  // console.log('update succeeded with response', r);
+                  // this.refreshNode(id);
+                  // var newTitle = '<span dir="ltr">' + r.f.findField("name").getValue() + ' (' + w.record.id + ')</span>';
+                  // w.setTitle(w.title.replace(/<span.*\/span>/, newTitle));
+                },
+                scope:this
+              },
+              'hide':{fn:function() {this.destroy();}}
+            }
+          });
+          w.title += ': <span id="tjg-' +  w.record.id + '" dir="ltr">' + w.record.name + ' ('+ w.record.id + ')</span>';
+          w.setValues(r.object);
+          w.show();
+          var extraTitleadd = " Chunk: "+ w.record.name + " ("+ w.record.id + ")";
+          var cid = ($("#tjg-" +  w.record.id).parents(".modx-window").find("textarea[name=snippet]").attr("id"));
+          tinyBlocksThrobber(0);
+          popGal(cid, tinyJSONGalleryTABtitle+extraTitleadd);
+
+        }
+      },
+      'failure': {
+        fn: function(r) {
+          // tinymce.get("tmpTempEditor").windowManager.alert("No data for Gallery");
+          tinyBlocksThrobber(0);
+        }
+      }
+    }
+  });
+}
+function tinyBlocksDefaultGalleryInit(){
+  if($("#tv"+tinyBlocksDefaultGallery).length){
+    popGal("tv"+tinyBlocksDefaultGallery, tinyBlocksProjectName + " Gallery TV");
+  }
+  else{
+    tinymce.get("tmpTempEditor").windowManager.alert("Gallery TV " +tinyBlocksDefaultGallery + " is not currently visibly attached to this Resource");
+  }
+}
+function tinyBlocksGalleryTinyJSON(){
+  function errorGal(message){
+    tinymce.get("tmpTempEditor").windowManager.alert("Error! " + message, tinyBlocksTitle);
+  }
+  if($(".tinyBlocksActive").length){
+    var chunkTVname = $(".tinyBlocksActive").find('.tb-title').text();
+    // var chunkTVname = $(editor.getBody()).parent().find('.tb-title').text(); // for future Standalone TinyMCE plugin
+    var tvChunkName = chunkTVname.replace(/[^a-zA-Z0-9\- ]/g, "").replace(/\s/g, '');
+    if(typeof TinyJSONGallery !== "undefined"){
+      if(tvChunkName){
+        tvChunkName = tvChunkName.toLowerCase().substr(tvChunkName.lastIndexOf('-') + 1);
+        if (tvChunkName.indexOf('tv') >= 0) {
+          if (isNaN(tvChunkName) && !isNaN(tvChunkName.substr(tvChunkName.lastIndexOf('tv') + 2))) {
+            var extraTitleadd = " TV: "+$("#"+tvChunkName).parents(".modx-tv").find(".modx-tv-caption").text();
+            if($("#"+tvChunkName).length){
+              popGal(tvChunkName, tinyJSONGalleryTABtitle+extraTitleadd);
+            }
+            else{
+              errorGal("'"+tvChunkName+"'" + " is not currently visibly attached to this Resource");
+            }
+          }
+          else{
+            errorGal("Valid title: etc-TV34");
+          }
+        }
+        else if (tvChunkName.indexOf('ch') >= 0) {
+          tvChunkName = tvChunkName.substr(tvChunkName.lastIndexOf('ch') + 2);
+          if (!isNaN(tvChunkName)) {
+            // tinyBlocksGallery("on");
+            tinyBlocksGalleryGetChunk(tvChunkName);
+          }
+          else{
+            errorGal("Valid title: etc-CH34");
+          }
+        }
+        else{
+          errorGal("Valid title: CH23 or TV34 or 'Title-CH23' or 'Another Title-TV34'");
+        }
+      }
+      else{
+        errorGal("Valid title: CH23 or TV34 or 'Title-CH23' or 'Another Title-TV34'");
+      }
+    }
+    else{
+      tinymce.get("tmpTempEditor").windowManager.alert("Error! TinyJSONGallery is not loaded");
+    }
+  }
+  else{
+    tinymce.get("tmpTempEditor").windowManager.alert("Needs an active block: hovered");
   }
 }
 function tinyBlocksRapidImage(blobInfo, success, failure) {
@@ -172,44 +390,44 @@ function tinyBlocksRapidImage(blobInfo, success, failure) {
     };
 
     formData = new FormData();
-    function tbRapidCallback(btn, text) {
+    var tbRapidCallback = function(btn, text) { //use assignment instead of declaration
+      var current, existingFilename;
       if(btn == "ok"){
         if (text) {
-          var current = text;
+          current = text;
           formData.append('file', blobInfo.blob(), current);
           xhr.send(formData);
           tinymce.activeEditor.getParam("tbRapidImageSettings",{}).tempFilename = current;
-          var existingFilename = $(tinymce.activeEditor.getBody()).find("img").each(function(){
+          existingFilename = $(tinymce.activeEditor.getBody()).find("img").each(function(){
             if($(this).attr("src").indexOf('blob:') >= 0){
               $(this).attr("data-tb-rapid", current);
             }
-          })
+          });
         }
         else if($(tinymce.activeEditor.getBody()).find("img[src*='blob:'][data-tb-rapid]").length){
-          var current = $(tinymce.activeEditor.getBody()).find("img[src*='blob:'][data-tb-rapid]").data("tb-rapid");
+          current = $(tinymce.activeEditor.getBody()).find("img[src*='blob:'][data-tb-rapid]").data("tb-rapid");
           formData.append('file', blobInfo.blob(), current);
           xhr.send(formData);
           tinymce.activeEditor.getParam("tbRapidImageSettings",{}).tempFilename = current;
         }
         else{
           if($(tinymce.activeEditor.getBody()).find("img[src*='blob:']").length){
-            var current = blobInfo.filename();
+            current = blobInfo.filename();
             formData.append('file', blobInfo.blob(), current);
             xhr.send(formData);
             tinymce.activeEditor.getParam("tbRapidImageSettings",{}).tempFilename = current;
-            var existingFilename = $(tinymce.activeEditor.getBody()).find("img").each(function(){
+            existingFilename = $(tinymce.activeEditor.getBody()).find("img").each(function(){
               if($(this).attr("src").indexOf('blob:') >= 0){
                 $(this).attr("data-tb-rapid", current);
               }
-            })
+            });
           }
         }
       }
       else{
         $(tinymce.activeEditor.getBody()).find("img[src*='blob:']").remove();
       }
-      // $("#tb-alert-input").hide();
-    }
+    };
 
     var title = 'Valid <b>image.ext</b> names only';
     var msg = '<span id="tb-alert-input"><i>Identical</i> name will overwrite duplicate server image<br><i>Cancel</i> will remove present data image from editor<br></span>';
@@ -222,12 +440,6 @@ function tinyBlocksRapidImage(blobInfo, success, failure) {
     var existingFilename = $(tinymce.activeEditor.getBody()).find("img[src*='blob:']").data("tb-rapid") || $(tinymce.activeEditor.getBody()).find("img[data-mce-selected]").data("tb-rapid") || tempName;
     var inputPar = $("#tb-alert-input").parent().parent();
     inputPar.find("input").val(existingFilename);
-    // inputPar.find("#tb-alert-input").remove();
-    // var msg2 = '<p id="tb-alert-input"><br><i>Identical</i> name will overwrite image<br><i>Cancel</i> will remove image from editor</p>';
-    // if(!inputPar.find("input").hasClass("tb-active")){
-    //   inputPar.find("br").remove();
-    //   inputPar.find("input").addClass("tb-active").after(msg2);
-    // }
   }
 }
 function tinyBlocksToolsMenu(){
@@ -241,7 +453,7 @@ function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapper
   if(tbTHC.length){
     var selectedBlocks = "<b>Every</b> Block will be removed";
     if(tbTHC_ui.length){
-      var selectedBlocks = "<b>"+tbTHC_ui.length+"</b> Selected Block(s) will be removed";
+      selectedBlocks = "<b>"+tbTHC_ui.length+"</b> Selected Block(s) will be removed";
     }
     var rowAction = function(btn) {
       if(btn == "ok"){
@@ -266,7 +478,7 @@ function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapper
           }
         },100);
       }
-    }
+    };
     if(mode == "temp"){
       rowAction("yes");
       return;
@@ -289,40 +501,50 @@ function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapper
 // *******
 
 function tinyBlocksImport(status) {
-  tinyBlocksToolsMenu();
-  tinyBlocksThrobber(1);
-  setTimeout(function(){
-    var content = document.getElementById(tinyBlocksMainWrapperId+"_HTML").value;
-    var tbMain = document.getElementById(tinyBlocksMainWrapperId);
-    var tbRWC = $(tbMain).find(".tinyBlocksRowsWrapperClass");
-    if(tinyBlocksPure){
-      tinyBlocksThrobber(0);
-      MODx.msg.alert("Pure Content!", "You are currently in '"+tinyBlocksPure+"' mode");
-      return;
-    }
-    if(content.indexOf("[[-TB-MARKER]]")>=0 || content.indexOf("[[-TB-MARKER-SINGLE]]")>=0){
-      var newContent = tinyBlocksImportWrapper.replace("[[+content]]", content.replace(/(?:\[\[\-TB-MARKER\]\])/g, tinyBlocksImportMarker ).replace("[[-TB-MARKER-SINGLE]]", ""));
-      tinyBlocksClearAll("temp");
-      $(tbRWC).hide().html(newContent);
-      tinyBlocksPrepareTLB($(tbRWC).find(".tb-wrapper-tlb"));
-      tinyBlocksPrepareAceBlock($(tbRWC).find(".tb-tiny-rc"));
-      tinyBlocksTinyMCE();
-      tinyBlocksRawCode();
-      tinyBlocksThrobber(0);
-      $(tbRWC).fadeIn();
-    }
-    else{
-      tinyBlocksThrobber(0);
-      MODx.msg.alert("Alert!", "Place [[-TB-MARKER]] wherever you want sections<br> OR place [[-TB-MARKER-SINGLE]] anywhere if you do not want sections");
-    }
-  }, 200);
+  if($(".tinyBlocksHTMLwrapper:visible").length){
+    tinyBlocksToolsMenu();
+    tinyBlocksThrobber(1);
+    var protectedMixture = "\\[\\[-"+tinyBlocksProjectNameUC+"]]";
+    var regexp = new RegExp(protectedMixture, "gi");
+    setTimeout(function(){
+      var content = document.getElementById(tinyBlocksMainWrapperId+"_HTML").value;
+      var tbMain = document.getElementById(tinyBlocksMainWrapperId);
+      var tbRWC = $(tbMain).find(".tinyBlocksRowsWrapperClass");
+      if(tinyBlocksPure){
+        tinyBlocksThrobber(0);
+        MODx.msg.alert("Pure Content!", "You are currently in '"+tinyBlocksPure+"' mode");
+        return;
+      }
+      if(content.indexOf("[[-"+tinyBlocksProjectNameUC+"]]")>=0 || content.indexOf("[[-"+tinyBlocksProjectNameUC+"-SINGLE]]")>=0){
+        var newContent = tinyBlocksImportWrapper.replace("[[+content]]", content.replace(regexp, tinyBlocksImportMarker ).replace("[[-"+tinyBlocksProjectNameUC+"-SINGLE]]", ""));
+        tinyBlocksClearAll("temp");
+        $(tbRWC).hide().html(newContent);
+        tinyBlocksPrepareTLB($(tbRWC).find(".tb-wrapper-tlb"));
+        tinyBlocksPrepareAceBlock($(tbRWC).find(".tb-tiny-rc"));
+        tinyBlocksTinyMCE();
+        tinyBlocksRawCode();
+        tinyBlocksThrobber(0);
+        $(tbRWC).fadeIn();
+      }
+      else{
+        tinyBlocksThrobber(0);
+        Ext.MessageBox.show({
+          title : "Import Manager",
+          msg : "<p>Copy [[-"+tinyBlocksProjectNameUC+"]] to wherever you want sections</p><br><p>OR Copy [[-"+tinyBlocksProjectNameUC+"-SINGLE]] to anywhere if you do not want sections</p>",
+          width : 400,
+          buttons : Ext.MessageBox.OK,
+        });
+      }
+    }, 200);
+  }
 }
 function tinyBlocksInsert(event, el) {
+  var tinyblockssnippet;
   if(event == "shortcut"){
-    var tinyblockssnippet = el;
+    tinyblockssnippet = el;
   }
   else{
-    var tinyblockssnippet = el.attr("data-tinyblocks-trigger");
+    tinyblockssnippet = el.attr("data-tinyblocks-trigger");
   }
   var snippetTpl = $("[data-tinyblocks="+tinyblockssnippet+"]").parents(".tinyBlocksRowTempHolderClass").clone(true, true); //crucial
   var tlb = snippetTpl.find(".tb-wrapper-tlb");
@@ -335,7 +557,23 @@ function tinyBlocksInsert(event, el) {
       MODx.msg.alert("Alert!", "No Ace!");
     }
   }
-  var activeRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass");
+  var activeRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass");
+  if(activeRow.hasClass("tb-nested-yes")){ //assumes that BEGIN already prepared the ground
+    snippetTpl.removeClass("tb-nested-no").addClass("tb-nested-yes").prepend("<div class=tb-select title='Drag to Sort; dbl/Click to Toggle Select/All'></div>");
+    if(tlb.hasClass("tb-tiny-rc") || tlb.find(".tb-tiny-rc").length){
+      tlb.removeClass("tb-wrapper-tlb tb-unwrap tb-mini tinyBlocksShrinkBlockClass " + tinyBlocksShrinkBlockClass);
+    }
+    else if(tlb.find("[class^=tb-tiny-]").length){
+      tlb.contents().unwrap();
+    }
+    else{
+      tlb.removeClass("tb-wrapper-tlb tb-unwrap tb-mini tinyBlocksShrinkBlockClass " + tinyBlocksShrinkBlockClass);
+    }
+    snippetTpl.html(tlb);
+    if(activeRow.hasClass("tb-nested-yes")){
+      snippetTpl.prepend("<div class=tb-select title='To move use Esc, UP / DOWN arrows; dbl/Click to Toggle Select/All'></div>");
+    }
+  }
   if(tinyBlocksPure == "fc" || tinyBlocksPure == "md" || tinyBlocksPure == "rc"){
     tlb.alterClass("tb-tiny-*", "").addClass("tb-tiny-" + tinyBlocksPure + " tb-tiny-pure");
   }
@@ -344,7 +582,9 @@ function tinyBlocksInsert(event, el) {
       $(snippetTpl).prependTo(".tinyBlocksRowsWrapperClass");
     }
     else{
-      activeRow.children(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+      if(activeRow.hasClass("tb-nested-no")){
+        activeRow.children(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+      }
       $(snippetTpl).insertAfter(activeRow);
     }
   }
@@ -357,16 +597,37 @@ function tinyBlocksInsert(event, el) {
   // tinyBlocksIconPicker();
   tinyBlocksThrobber(0);
 }
-function tinyBlocksQuickInsert(num){
-  var num = num - 1;
+function tinyBlocksQuickInsert(num, destination){
+  num = num - 1;
   var item = $("#blockSnippetBar").find("[data-tinyblocks-trigger]:eq("+num+")");
-  if(item){
-    item.trigger("click");
+  var itemNext = $("<div>").prepend($("#blockSnippetBar").find("[data-tinyblocks]:eq("+num+")").clone().alterClass("tb-*","").removeClass("tinyBlocksShrinkBlockClass "+tinyBlocksShrinkBlockClass).removeAttr('data-tinyblocks data-tb-title').addClass("tb-mini"));
+  itemNext.find(".tb-mini").children().addClass("mceEditable");
+  itemNext = itemNext.html();
+  if(item.length){
+    if(itemNext && destination == "mini" && tinymce.activeEditor.id !=="tmpTempEditor"){
+      tinymce.activeEditor.focus();
+      tinymce.activeEditor.insertContent(itemNext);
+    }
+    else if(!destination){
+      item.trigger("click");
+    }
   }
+  po = itemNext;
 }
 function tinyBlocksPrepareTLB(el) {
   el.each(function(){
     var tempTLB = '';
+    var tlbChildren = $(this).find("[class^=tb-tiny-]:not(.tb-tiny-rc)");
+    if(tlbChildren.length){
+      $(this).addClass("tb-nested-wrapper");
+      tlbChildren.wrap("<div class='"+tinyBlocksRowTempHolderClass+" tinyBlocksRowTempHolderClass tb-nested-yes'></div>");
+      tlbChildren.parent().prepend(
+        $('<div>', {
+          'class': 'tb-select tb-nested-yes',
+          'title': 'To move use Esc, UP / DOWN arrows; dbl/Click to Toggle Select/All'
+        })
+      );
+    }
     if($(this).hasClass('tb-unwrap')){
       var tempTitle = $(this).data("tb-title");
       var tempBlockID = $(this).data("tinyblocks");
@@ -375,19 +636,22 @@ function tinyBlocksPrepareTLB(el) {
       }).join(" ");
       $(this).alterClass("tb-*", "").removeAttr("data-tinyblocks");
       // $(this).alterClass("tb-*", "").removeAttr("data-tinyblocks data-tb-title");
-      var tempTLB = "<div class='" + tempClassNames + " " + tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass' data-tinyblocks='"+tempBlockID+"' data-tb-title='"+tempTitle+"'></div>";
+      // tempTLB = "<div class='" + tempClassNames + " " + tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass' data-tinyblocks='"+tempBlockID+"' data-tb-title='"+tempTitle+"'></div>";
+      tempTLB = "<div class='" + tempClassNames + "' data-tinyblocks='"+tempBlockID+"' data-tb-title='"+tempTitle+"'></div>";
     }
     else{
       if($("#"+tinyBlocksMainWrapperId + " .tb-wrapper-tlb").length > 1){
-        $(this).addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+        // $(this).addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
       }
     }
-    $(this).wrap("<div class='tinyBlocksRowTempHolderClass "+tinyBlocksRowTempHolderClass+"'>" + tempTLB + "</div>")
+    var wrapper = "<div class='tinyBlocksRowTempHolderClass tb-nested-no "+tinyBlocksRowTempHolderClass+"'>" + tempTLB + "</div>";
+    $(this).wrap(wrapper);
+    var text;
     if($(this).attr('data-tb-title')){
-      var text = $(this).attr('data-tb-title').replace(/'|\"/g, "");
+      text = $(this).attr('data-tb-title').replace(/'|\"/g, "");
     }
     else{
-      var text = "";
+      text = "";
     }
     $(this).parents(".tinyBlocksRowTempHolderClass").prepend(
     // .before(
@@ -395,23 +659,24 @@ function tinyBlocksPrepareTLB(el) {
       //   'class': 'tb-ui-drag-handle'
       // }),
       $('<div>', {
-        'class': 'tb-select',
-        'title': 'Drag to Sort; Click to Toggle Select/All'
+        'class': 'tb-select tb-nested-no',
+        'title': 'Drag to Sort; dbl/Click to Toggle Select/All'
       }),
-      $('<div class=tb-spacer><div class=tb-title title="Edit Title" contenteditable=true>'+text+'</div></div>')
-    )
+      $('<div class=tb-spacer><div class=tb-name title=Type></div><div class=tb-title title="Edit Title" contenteditable=true>'+text+'</div></div>')
+    );
   });
 }
 function tinyBlocksPrepareAceBlock(el) {
-  if(!tinyBlocksPure){
+  if(!tinyBlocksPure || tinyBlocksPure == "rc"){
     el.each(function(){
-      if(!$(this)[0].nodeName == "PRE"){
-        var html = $(this).html().replace(/(?:&amp;gt;|&gt;)/g, ">");
-        var content = tinymce.html.Entities.encodeAllRaw(html);
+      var content, html;
+      if($(this)[0].nodeName !== "PRE"){
+        html = $(this).html().replace(/(?:&amp;gt;|&gt;)/g, ">");
+        content = tinymce.html.Entities.encodeAllRaw(html);
       }
       else{
-        var html = $(this).html();
-        var content = tinymce.html.Entities.decode(html);
+        html = $(this).html();
+        content = tinymce.html.Entities.decode(html);
       }
       $(this).html("<textarea style='display:none;' class='tb-tiny-rc-sub'>" + content + "</textarea>");
       // console.log(content);
@@ -437,13 +702,17 @@ function tinyBlocksRawCode() {
   });
 }
 function tinyBlocksDuplicate() {
-  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass");
+  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass");
   if(thisRow){
     tinyBlocksToolsMenu();
-    $(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+    if(thisRow.hasClass("tb-nested-no")){
+      $(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+    }
     var thisClone = thisRow.clone(true, true);
     var tlb = thisClone.find(".tb-wrapper-tlb");
-    tlb.prev(".tb-spacer").addClass(tinyBlocksNewBlockClass, tinyBlocksDuplicateBlockClass + " tinyBlocksNewBlockClass tinyBlocksDuplicateBlockClass");
+    if(thisRow.hasClass("tb-nested-no")){
+      tlb.prev(".tb-spacer").addClass(tinyBlocksNewBlockClass, tinyBlocksDuplicateBlockClass + " tinyBlocksNewBlockClass tinyBlocksDuplicateBlockClass");
+    }
     thisClone.find(".tb-tiny-rc-sub").uniqueId().hide().parents(".tb-tiny-rc").addClass("tb-no-ace");
 
     // thisClone.find(".tb-tiny-md, .tb-tiny-md-mini").empty() // if there is trouble with encoding Markdown
@@ -461,7 +730,7 @@ function tinyBlocksDuplicate() {
   }
 }
 function tinyBlocksDelete(){
-  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass");
+  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass");
   if(thisRow.length){
     var ind = thisRow.index()+1;
     var rowAction = function(btn) {
@@ -471,7 +740,7 @@ function tinyBlocksDelete(){
         thisRow.fadeOut().delay(500).remove();
         tinyBlocksLoneOrNoBlock();
       }
-    }
+    };
     Ext.MessageBox.show({
       title : "Permanent Block Deletion!",
       msg : "This Block (#"+ind+") will be removed",
@@ -483,26 +752,51 @@ function tinyBlocksDelete(){
   }
 }
 function tinyBlocksShortcutJSON(){
+  function prepareJSON(js){
+    js = js.replace(/\n\s*$/, '').replace(/\n/g, ',');
+    js = '[' + js + ']';
+    js = tinymce.util.JSON.parse(js);
+    return js;
+  }
   tinyBlocksShortcut = '';
-  $('#blockSnippetBar').find('[data-tinyblocks-trigger]').each(function () {
+  tinyBlocksTemplateMenu = '';
+  $('#blockSnippetBar').find('[data-tinyblocks-trigger]').each(function (index) {
+    index = index + 1;
+    var title = $(this).attr('data-tinyblocks-trigger');
     var text = $(this).text().trim();
     var click = $(this).data('tinyblocks-trigger');
-    tinyBlocksShortcut += '{text: "' + text + '", onclick: function(){tinyBlocksInsert("shortcut","' + click + '")}}\n';
+    tinyBlocksShortcut += '{text: "' + index + ". " + text + '", onclick: function(){tinyBlocksInsert("shortcut","' + click + '")}}\n';
+    // var itemNext = $("<div>").prepend($('#blockSnippetBar').find('.tb-mini[data-tinyblocks='+title+']').clone().alterClass("tb-*","").removeClass("tinyBlocksShrinkBlockClass "+tinyBlocksShrinkBlockClass).removeAttr('data-tinyblocks data-tb-title').addClass("tb-mini"));
+    // itemNext.find(".tb-mini").children().addClass("mceEditable");
+    // itemNext = itemNext.html();
+    // tinyBlocksTemplateMenu += '{title: "' + text + '", content: "' + JSON.stringify(itemNext).slice(1, -1) + '"}\n';
   });
-  tinyBlocksShortcut = tinyBlocksShortcut.replace(/\n\s*$/, '');
-  tinyBlocksShortcut = '[' + tinyBlocksShortcut.replace(/\n/g, ',') + ']';
-  tinyBlocksShortcut = tinymce.util.JSON.parse(tinyBlocksShortcut);
+  $('#blockSnippetBar').find('.tb-mini[data-tinyblocks]').each(function () {
+    var title = $(this).attr('data-tinyblocks');
+    var text = $('#blockSnippetBar').find('[data-tinyblocks-trigger='+title+']').text().trim();
+    var itemNext = $("<div>").prepend($(this).clone().alterClass("tb-*","").removeClass("tinyBlocksShrinkBlockClass "+tinyBlocksShrinkBlockClass).removeAttr('data-tinyblocks data-tb-title').addClass("tb-mini"));
+    itemNext.find(".tb-mini").children().addClass("mceEditable");
+    itemNext = itemNext.html();
+    tinyBlocksTemplateMenu += '{title: "' + text + '", content: "' + JSON.stringify(itemNext).slice(1, -1) + '"}\n';
+  });
+  tinyBlocksShortcut = prepareJSON(tinyBlocksShortcut);
+  tinyBlocksTemplateMenu = prepareJSON(tinyBlocksTemplateMenu);
+
 }
 function tinyBlocksUpAndDown(direction){
   tinyBlocksMouseHoverTraffic = 1;
-  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass");
+  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass");
   // var thisRow = $("#"+tinyBlocksMainWrapperId).find(".tinyBlocksRowTempHolderClass.tinyBlocksActive");
-  $("#"+tinyBlocksMainWrapperId).find(".ui-selected").removeClass("ui-selected");
-  thisRow.addClass("ui-selected");
+  if(thisRow.hasClass("tb-nested-no")){
+    $("#"+tinyBlocksMainWrapperId).find(".ui-selected").removeClass("ui-selected");
+    thisRow.addClass("ui-selected");
+  }
   var prev = thisRow.prev();
   var next = thisRow.next();
   // tinyBlocksToolsMenu();
-  $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+  if(thisRow.hasClass("tb-nested-no")){
+    $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+  }
   if(direction == "ArrowUp" && prev.length){
     thisRow.insertBefore(prev);
   }
@@ -510,7 +804,17 @@ function tinyBlocksUpAndDown(direction){
     thisRow.insertAfter(next);
   }
 }
-
+function tinyBlocksRecordSequence() {
+  Mousetrap.record(function(sequence) {
+    var seq = sequence.join('').replace(/alt|\+/g, "");
+    if($(tinymce.activeEditor.getBody()).hasClass("mce-edit-focus")){
+      tinyBlocksQuickInsert(seq, "mini");
+    }
+    else{
+      tinyBlocksQuickInsert(seq);
+    }
+  });
+}
 function tinyBlocksKeyBoard(){
   if(typeof tinyBlocksCustomKeyBoard == "undefined"){
     //only ExtJS can highjack ExtJS
@@ -521,6 +825,9 @@ function tinyBlocksKeyBoard(){
         e.stopEvent();
         tinyBlocksSave();
       }
+    });
+    Mousetrap.bindGlobal('option', function () {
+      tinyBlocksRecordSequence();
     });
     Mousetrap.bind(['up', 'down'], function(e) {
       tinyBlocksUpAndDown(e.code);
@@ -536,15 +843,27 @@ function tinyBlocksKeyBoard(){
       '+': function () {
         $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").removeClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
       },
-      'h': tinyBlocksGuide,
-      'm': tinyBlocksShowHTML,
-      'i m': tinyBlocksImport,
       'a': function() {
         $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowTempHolderClass").addClass("ui-selected");
       },
+      '0': tinyBlocksCountAll,
+      'b': tinyBlocksDebug,
+      'c': tinyBlocksDuplicate,
+      'd': tinyBlocksDisable,
+      'h': tinyBlocksGuide,
+      'g t': tinyBlocksDefaultGalleryInit,
+      'g 1': tinyBlocksGalleryTinyJSON,
+      'g g': tinyBlocksGallery,
+      'i m': tinyBlocksImport,
+      'r t': function(){
+        if(tinyBlocksRandomTip){
+          tinymce.get("tmpTempEditor").windowManager.alert(tinyBlocksRandomTip);
+        }
+      },
+      's': tinyBlocksShowHTML,
+      't': tinyBlocksTitle,
       'del 1': tinyBlocksDelete,
       'del a': tinyBlocksClearAll,
-      'c': tinyBlocksDuplicate,
       'home': function (e) {
         if($(".tinyBlocksDistraction").length){
           $(".tinyBlocksDistraction").removeClass("tinyBlocksDistraction");
@@ -558,13 +877,25 @@ function tinyBlocksKeyBoard(){
             $(".x-layout-mini.x-layout-mini-west").trigger("click");
           }
         }
-      },
+      }
     });
   }
 }
 
 // *******
-
+function tinyBlocksTempEditorManager(){
+  if(!$("#tmpTempEditor").length){
+    $("body").append("<div id=tmpTempEditor style=display:none;height:0;width:0;opacity:0;visibility:hidden></div>");
+    tinymce.init({
+      selector: "#tmpTempEditor",
+      skin_url: tinyBlocksTinymceSkinUrl,
+      inline:true,
+      forced_root_block : "",
+      force_br_newlines : false,
+      force_p_newlines : false
+    });
+  }
+}
 function tinyBlocksLoneOrNoBlock(){
   var loneBlock = $(".tinyBlocksRowsWrapperClass .tinyBlocksRowTempHolderClass");
   if(loneBlock.length < 2){
@@ -574,13 +905,48 @@ function tinyBlocksLoneOrNoBlock(){
   else{
     loneBlock.removeClass("tb-lone-block");
   }
-  if (!$('.tinyBlocksRowsWrapperClass') [0].hasChildNodes()) {
-    $('.tinyBlocksRowsWrapperClass').html(tinyBlocksHelp);
+  // if (!$('.tinyBlocksRowsWrapperClass') [0].hasChildNodes()) {
+  if (!$('.tinyBlocksRowsWrapperClass').children(".tinyBlocksRowTempHolderClass").length){
+    if(tinyBlocksDefaultBlock){
+      $('.tinyBlocksRowsWrapperClass').html(tinyBlocksDefaultBlock);
+      tinyBlocksPrepareTLB($(".tinyBlocksRowsWrapperClass .tb-wrapper-tlb"));
+      tinyBlocksPrepareAceBlock($(".tinyBlocksRowsWrapperClass .tb-tiny-rc"));
+      if($(".mce-tinyBlocksTools").length){
+        tinyBlocksTinyMCE();
+        tinyBlocksRawCode();
+      }
+      tinyBlocksLoneOrNoBlock();
+    }
+    else{
+      $('.tinyBlocksRowsWrapperClass').html(tinyBlocksHelp);
+    }
   }
   else{
-    $('.tinyBlocksRowsWrapperClass .tb-guide').remove();
+    if(!tinyBlocksDefaultBlock){
+      $('.tinyBlocksRowsWrapperClass .tb-guide').remove();
+    }
   }
 
+}
+function tinyBlocksTitle() {
+  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb");
+  var thisTitle = $(".mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-title");
+  var rowAction = function(btn, text) {
+    if(btn == "ok"){
+      if(text){
+        // var text = text.replace(/\s/g, "-").replace(/'|\"/g, "");
+        text = text.replace(/'|\"/g, "");
+        thisRow.attr("data-tb-title", text);
+        thisTitle.text(text);
+      }
+      else{
+        thisRow.removeAttr("data-tb-title");
+        thisTitle.text("");
+      }
+    }
+  };
+  Ext.MessageBox.prompt("Title","<span id=tb-alert-title>Special weird Characters are removed</span>",rowAction);
+  $(".ext-mb-input").val(thisRow.attr("data-tb-title"));
 }
 function tinyBlocksGuide() {
   Ext.MessageBox.show({
@@ -594,15 +960,43 @@ function tinyBlocksGuide() {
 }
 function tinyBlocksThrobber(power,delay){
   delay = delay ? delay : 0;
-  if(power == 0){
+  if(power === 0){
     setTimeout(function(){
-      $("#tinyBlocksThrobber").remove()
-    }, delay)
+      $("#tinyBlocksThrobber").remove();
+    }, delay);
   }
   else if(power == 1){
     $("#tinyBlocksThrobber").remove();
     $("#" + tinyBlocksMainWrapperId).prepend('<div id="tinyBlocksThrobber"></div>');
   }
+}
+function tinyBlocksDebug(){
+  if($(".tinyBlocksDebug").length){
+    if($(".tinyBlocksDebug:hidden").length){
+      $(".tinyBlocksDebug").fadeIn();
+    }
+    else{
+      $(".tinyBlocksDebug").fadeOut();
+    }
+  }
+  else{
+    MODx.msg.alert("Alert!","Debug Info is switched off for this Template");
+  }
+}
+function tinyBlocksDisable(){
+  var rowAction = function(btn){
+    if(btn == "ok"){
+      location.href = tinyBlocksThisPageUrl+"&"+tinyBlocksProjectName.toLowerCase()+"=disabled";
+    }
+  };
+  Ext.MessageBox.show({
+    title : "Disable " + tinyBlocksProjectName,
+    msg : "This Page is about to Refresh",
+    width : 280,
+    buttons : Ext.MessageBox.OKCANCEL,
+    fn : rowAction,
+    icon : Ext.MessageBox.WARNING
+  });
 }
 function tinyBlocksShowHTML() {
   var tbMain = document.getElementById(tinyBlocksMainWrapperId+"_HTML");
@@ -614,37 +1008,53 @@ function tinyBlocksShowHTML() {
     $(tbMainS).fadeOut();
   }
 }
-
+function tinyBlocksCountAll(){
+  var tbMain = document.getElementById(tinyBlocksMainWrapperId);
+  var tbTHC  = $(tbMain).find(".tinyBlocksRowTempHolderClass");
+  var tbTHClength = tbTHC.length;
+  if(tbTHClength){
+    tinymce.get("tmpTempEditor").windowManager.alert("Total number of "+tinyBlocksProjectName+": "+tbTHClength+"");
+  }
+}
 // *******
 
 //begin
-function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, rowsWrapperClass, newBlockClass, hiddenBlockClass, duplicateBlockClass, shrinkClass, saveButtonTpl, importWrapper, importMarker, thisPageUrl, pure, help) {
+function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, rowsWrapperClass, newBlockClass, hiddenBlockClass, duplicateBlockClass, shrinkClass, saveButtonTpl, importWrapper, importMarker, defaultBlock, defaultGallery, thisPageUrl, tinymceSkinUrl, pure, help, randomTip, projectName) {
   if(typeof tinyBlocksItems == "undefined"){
     tinyBlocksItems = {};
   }
   //two ways to initiate TinyBlocks
-  tinyBlocksSourceFeed = tinyBlocksItems["sourceFeed"] || sourceFeed;
-  tinyBlocksOriginalSourceId = tinyBlocksItems["originalSourceId"] || originalSourceId;
+  tinyBlocksSourceFeed = tinyBlocksItems.sourceFeed || sourceFeed;
+  tinyBlocksOriginalSourceId = tinyBlocksItems.originalSourceId || originalSourceId;
   tinyBlocksMainWrapperId = "tinyBlocksMainWrapperId_" + tinyBlocksOriginalSourceId;
-  tinyBlocksRowClass = tinyBlocksItems["rowClass"] || rowClass;
-  tinyBlocksRowTempHolderClass = tinyBlocksItems["rowTempHolderClass"] || rowTempHolderClass;
-  tinyBlocksRowsWrapperClass = tinyBlocksItems["rowsWrapperClass"] || rowsWrapperClass;
-  tinyBlocksNewBlockClass = tinyBlocksItems["newBlockClass"] || newBlockClass;
-  tinyBlocksHiddenBlockClass = tinyBlocksItems["hiddenBlockClass"] || hiddenBlockClass;
-  tinyBlocksDuplicateBlockClass = tinyBlocksItems["duplicateBlockClass"] || duplicateBlockClass;
-  tinyBlocksShrinkBlockClass = tinyBlocksItems["shrinkClass"] || shrinkClass;
-  tinyBlocksSaveButtonTpl = tinyBlocksItems["saveButtonTpl"] || saveButtonTpl;
-  tinyBlocksImportWrapper = tinyBlocksItems["importWrapper"] || importWrapper;
-  tinyBlocksImportMarker = tinyBlocksItems["importMarker"] || importMarker;
-  tinyBlocksPure = tinyBlocksItems["pure"] || pure;
-  tinyBlocksHelp = tinyBlocksItems["help"] || help;
-  tinyBlocksThisPageUrl = tinyBlocksItems["thisPageUrl"] || thisPageUrl;
+  tinyBlocksRowClass = tinyBlocksItems.rowClass || rowClass;
+  tinyBlocksRowTempHolderClass = tinyBlocksItems.rowTempHolderClass || rowTempHolderClass;
+  tinyBlocksRowsWrapperClass = tinyBlocksItems.rowsWrapperClass || rowsWrapperClass;
+  tinyBlocksNewBlockClass = tinyBlocksItems.newBlockClass || newBlockClass;
+  tinyBlocksHiddenBlockClass = tinyBlocksItems.hiddenBlockClass || hiddenBlockClass;
+  tinyBlocksDuplicateBlockClass = tinyBlocksItems.duplicateBlockClass || duplicateBlockClass;
+  tinyBlocksShrinkBlockClass = tinyBlocksItems.shrinkClass || shrinkClass;
+  tinyBlocksSaveButtonTpl = tinyBlocksItems.saveButtonTpl || saveButtonTpl;
+  tinyBlocksImportWrapper = tinyBlocksItems.importWrapper || importWrapper;
+  tinyBlocksImportMarker = tinyBlocksItems.importMarker || importMarker;
+  tinyBlocksDefaultBlock = tinyBlocksItems.defaultBlock || defaultBlock || "";
+  tinyBlocksDefaultGallery = tinyBlocksItems.defaultGallery || defaultGallery || "";
+  tinyBlocksPure = tinyBlocksItems.pure || pure;
+  tinyBlocksHelp = tinyBlocksItems.help || help;
+  tinyBlocksThisPageUrl = tinyBlocksItems.thisPageUrl || thisPageUrl;
+  tinyBlocksTinymceSkinUrl = tinyBlocksItems.tinymceSkinUrl || tinymceSkinUrl;
+  tinyBlocksRandomTip = tinyBlocksItems.randomTip || randomTip || "";
+  tinyBlocksProjectName = tinyBlocksItems.projectName || projectName;
+  tinyBlocksProjectNameUC = tinyBlocksProjectName.toUpperCase();
+  tinyBlocksProjectNameLC = tinyBlocksProjectName.toLowerCase();
 
   if(tinyBlocksOriginalSourceId && tinyBlocksMainWrapperId && tinyBlocksRowClass && tinyBlocksRowTempHolderClass && tinyBlocksRowsWrapperClass){
     tinyBlocksThrobber(1);
     $("."+tinyBlocksRowsWrapperClass).addClass("tinyBlocksRowsWrapperClass");
 
-    $("<div id=tinyBlocksControlButtonsWrapper></div><div id=tinyBlocksTempEd style=display:none></div><div id=tinymceWrapperBubbleBar></div>").prependTo("body");
+    $("<div id=tinyBlocksControlButtonsWrapper></div><div id=tinyBlocksBubbleBar></div>").prependTo("body");
+
+    tinyBlocksTempEditorManager();
 
     $("#" + tinyBlocksMainWrapperId).prepend("<div class='tinyBlocksHTMLwrapper' style=display:none><div id='"+tinyBlocksMainWrapperId+"_HTML_btn' class='tinyBlocksHTMLbtn'></div><textarea id='"+tinyBlocksMainWrapperId+"_HTML' class='tinyBlocksHTML'></textarea></div>");
     $("#"+tinyBlocksMainWrapperId+"_HTML").val($("#"+tinyBlocksOriginalSourceId).val());
@@ -660,64 +1070,110 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
     tinyBlocksShortcutJSON();
     
     tinyBlocksClickReady = 1;
+
     $("[data-tinyblocks-trigger]").on("click",function(){
       if(tinyBlocksClickReady){
         tinyBlocksInsert("click", $(this));
       }
     });
 
+    if(tinyBlocksDefaultGallery){
+      if($("#tv"+tinyBlocksDefaultGallery).length){
+        $("#tv"+tinyBlocksDefaultGallery + ":visible").addClass("tb-gallery-tv");
+        $(".tb-gallery-tv").parent().addClass("tb-gallery-tv").attr("data-tb-tv", tinyBlocksDefaultGallery).on("click", function(){
+        popGal("tv"+tinyBlocksDefaultGallery, tinyBlocksProjectName + " Gallery TV");
+        });
+      }
+    }
+
     tinyBlocksMouseHoverTraffic = 0;
     tinymce.ui.Factory.create({
-      type: "menubutton",
-      text:"Import / Debug / Disable",
+      type: "button",
+      text:"Import (i + m) ",
       classes:"tinyBlocksHTMLTools",
-      onPostRender:function(){
-        tinymce.DOM.loadCSS(tinyBlocksItems["sourceBTNcss"]);
+      onclick: tinyBlocksImport,
+      // onPostRender:function(){ //taken over by tempEditor
+      //   tinymce.DOM.loadCSS(tinyBlocksTinymceSkinUrl+'/skin.min.css'); //dubious
+      // },
+    }).renderTo(document.getElementById(tinyBlocksMainWrapperId+"_HTML_btn"));
+    tinymce.ui.Factory.create({
+      type: "menubutton",
+      // text: tinyBlocksProjectName.substring(0,2),
+      text: tinyBlocksProjectName,
+      classes: "tinyBlocksButton",
+      icon: "table",
+      tooltip: tinyBlocksProjectName + " Content Manager Main Menu",
+      hidden:true,
+      autohide:true,
+      onPostRender: function(){
+        if(tinyBlocksRandomTip){
+          $("#tb-random-tip").text(tinyBlocksRandomTip).delay(1400).fadeIn("slow");
+        }
+        $("#tinyBlocksButtonHolder, .mce-tinyBlocksButton").delay(1400).fadeIn("slow");
       },
       menu:[
         {
-          text: "Import/Convert Source",
-          classes:"import",
-          onclick: tinyBlocksImport
+          text: "Gallery Manager",
+          classes:"tb-gallery",
+          menu: [
+          {
+            text: "Main Gallery For this Document (g + t)",
+            classes:"tb-tv-gallery",
+            onclick: tinyBlocksDefaultGalleryInit
+          },
+          {
+            text: "Gallery for Current Row/Block (g + 1)",
+            classes:"tb-o-gallery",
+            onclick: tinyBlocksGalleryTinyJSON,
+          },
+          {
+            text: "Toggle Global Gallery (g + g)",
+            classes:"tb-gallery",
+            onclick: tinyBlocksGallery,
+          },
+          ]
         },
         {
-          text: "Toggle Debug Info in SideBar",
-          classes:"debug",
-          onclick: function(){
-            if($(".tinyBlocksDebug").length){
-              if($(".tinyBlocksDebug:hidden").length){
-                $(".tinyBlocksDebug").fadeIn();
-              }
-              else{
-                $(".tinyBlocksDebug").fadeOut();
-              }
-            }
-            else{
-              MODx.msg.alert("Alert!","Debug Info is switched off for this Template");
+          text: "Delete All Rows (del + a)",
+          onclick: tinyBlocksClearAll
+        },
+        {
+          text: "Quick Insert (1 - 9)",
+          menu: tinyBlocksShortcut,
+          classes: "quickInsert",
+          onPostRender: function(){
+            if(!tinyBlocksShortcut.length){
+              $(".mce-quickInsert").remove();
             }
           }
         },
         {
-          text: "Disable Structures",
-          classes:"disable",
-          onclick: function(){
-            var rowAction = function(btn){
-              if(btn == "ok"){
-                location.href = tinyBlocksThisPageUrl+"&structures=disabled";
-              }
+          text: "Source / Import / Debug, Etc ...",
+          menu: [ {
+            text: "Source / Import (s)",
+            onclick: tinyBlocksShowHTML
+          },
+          {
+            text: "Debug Info (b)",
+            classes:"debug",
+            tooltip : "appears in "+tinyBlocksProjectName+" sidebar",
+            onclick: tinyBlocksDebug
+          },
+          {
+            text: "Disable " + tinyBlocksProjectName + " (d)",
+            classes:"disable",
+            onclick: tinyBlocksDisable
+          },{
+            text: "About",
+            onclick: function(){
+              tinymce.get("tmpTempEditor").windowManager.alert(tinyBlocksProjectName + " 3.0-beta1; tinyBlocks.js-beta3; by donShakespeare 2016");
             }
-            Ext.MessageBox.show({
-              title : "Disable Structures",
-              msg : "This Page is about to Refresh",
-              width : 280,
-              buttons : Ext.MessageBox.OKCANCEL,
-              fn : rowAction,
-              icon : Ext.MessageBox.WARNING
-            });
-          }
-        }
-      ]
-    }).renderTo(document.getElementById(tinyBlocksMainWrapperId+"_HTML_btn"));
+          }]
+        },{
+          text: "Help (h)",
+          onclick: tinyBlocksGuide
+        }]
+    }).renderTo(document.getElementById("tinyBlocksButtonHolder"));
     tinymce.ui.Factory.create({
       type: "menubutton",
       hidden: true,
@@ -727,9 +1183,11 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         tinyBlocksTinyMCE();
         tinyBlocksRawCode();
         tinyBlocksThrobber(0);
+        tinyBlocksGallery("begin");
+        // $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowsWrapperClass, .tb-nested-wrapper") // it i spointles, inconvenient and cumbersome to have drag n drop for nested blocks, seriously!
         $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowsWrapperClass")
         .sortable({
-            handle: ".tb-select",
+            handle: ".tb-select.tb-nested-no",
             // handle: ".tb-ui-drag-handle",
             // cancel: ".tinyBlocksRowTempHolderClass > *:not(.tb-ui-drag-handle)", //same as above
             placeholder: "ui-state-highlight",
@@ -748,8 +1206,8 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
               // tinyBlocksToolsMenu();
               $("body").addClass('ui-drag');
               visibleLi  = $('.tinyBlocksRowTempHolderClass.ui-selected').length;
-              visibleSelected  = $(".ui-selected:visible").length;
-              if($(".ui-selected:visible").length > 1){
+              visibleSelected  = $("#" + tinyBlocksMainWrapperId + " .ui-selected:visible").length;
+              if(visibleSelected > 1){
                 ui.item.siblings(".ui-selected").addClass("tinyBlocksEnRouteSibling");
                 $(".tinyBlocksEnRouteSibling:not(.tb-ui-multiple-select)").hide().wrapAll("<div class='tinyBlocksTempUI' style='display:none' />");
                 ui.item.addClass("tb-ui-multiple-select ui-selected");
@@ -759,11 +1217,19 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
               }
               // $(".mce-widget.mce-tooltip").addClass("hideTooltip");
               tinyBlocksMouseHoverTraffic = 1;
-              $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+                // $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+              if(ui.item.hasClass("tb-nested-yes")){
+                 ui.item.parent().find(".tinyBlocksRowTempHolderClass").find("[class^=tb-tiny-]").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+                 ui.item.parent().css({"height": ui.item.parent().outerHeight(true), "overflow":"hidden"});
+              }
+              else{
+                ui.item.parent().find(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+              }
             },
             stop: function(event,ui){
               tinyBlocksClickReady = 1;
               tinyBlocksMouseHoverTraffic = 0;
+              ui.item.parent().removeAttr("style");
               ui.item.removeAttr("style");
               $("body").removeClass('ui-drag');
               var valid = $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowTempHolderClass").length;
@@ -773,6 +1239,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
               //   $(".tinyBlocksTempUI").contents().unwrap();
               //   alert("abberation")
               // }
+              // $(".tinyBlocksActive").parent().find(".tinyBlocksRowTempHolderClass").children("[class^=tb-tiny-]").removeClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
               if(!$(".tinyBlocksTempUI").find(".tb-ui-multiple-select").length && $(".tb-ui-multiple-select").length){ //normal
                 $(".tinyBlocksTempUI").insertAfter(".tb-ui-multiple-select");
                 $(".tinyBlocksTempUI").contents().unwrap();
@@ -799,19 +1266,28 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         })
         .css("position","relative")
         .selectable({
+          // filter: ".tinyBlocksRowTempHolderClass, tb-nested-wrapper [class^=tb-tiny-]",
           filter: ".tinyBlocksRowTempHolderClass",
           cancel: ".tb-guide,.tinyBlocksRowTempHolderClass > *", //covers external Inline Ace plugin
+          // cancel: ".tb-guide,.tinyBlocksRowTempHolderClass.tb-nested-no > *:not(.tb-nested-wrapper)",
           // cancel: ".tb-wrapper-tlb, .tb-title-spacer, .tb-ui-drag-handle, .mce-tinyBlocksTools"
         });
 
         $("[data-tinyblocks-trigger]")
         .draggable({
           connectToSortable: "#" + tinyBlocksMainWrapperId + " .tinyBlocksRowsWrapperClass",
-          helper: "clone",
+          // helper: "clone",
+          helper: function(e) {
+            var original = $(e.target).hasClass("ui-draggable") ? $(e.target) : $(e.target).closest(".ui-draggable");
+            original.addClass("tb-onRoute").parent().addClass("tb-onRoute");
+            return original.clone().addClass('tb-ui-drag-helper').css({
+              width: original.width()
+            });
+          },
           revert: "invalid",
           zIndex:99999,
           containment:"window",
-          delay: 10,
+          delay: 5,
           cancel:false, // for <buttons>
           // forcePlaceholderSize: true,
           // forceHelperSize: true,
@@ -825,11 +1301,12 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
             $(".tinyBlocksRowsWrapperClass .ui-selected").removeClass("ui-selected");
             $("body, #blockSnippetBar").addClass('ui-drag');
             tinyBlocksClickReady = 0;
-            $(ui.helper).addClass('tb-ui-drag-helper');
+            // $(ui.helper).addClass('tb-ui-drag-helper');
             $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
           },
           stop:function(event,ui){
             $("body, #blockSnippetBar").removeClass('ui-drag');
+            $(".tb-onRoute").removeClass('tb-onRoute');
             // $(".tb-ui-drag-helper").hide(); //too quick
             tinyBlocksClickReady = 1;
           }
@@ -839,7 +1316,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
       menu:[
         {
           icon: false,
-          text: "Duplicate",
+          text: "Duplicate (c)",
           classes:"tb-duplicate",
           onclick: tinyBlocksDuplicate,
           onPostRender: function(){
@@ -848,16 +1325,16 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         },
         {
           icon: false,
-          text: "Delete",
+          text: "Delete (del + 1)",
           classes:"tb-trash",
           onclick: tinyBlocksDelete
         },
         {
           icon: false,
-          text: "Resize",
+          text: "Resize (all: -/+)",
           classes:"tb-enlarge",
           onclick: function() {
-            var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb");
+            var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb");
             if(thisRow.hasClass("tinyBlocksShrinkBlockClass")){
               thisRow.removeClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
             }
@@ -866,50 +1343,28 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
             }
           }
         },
-        // {
-        //   icon: false,
-        //   text: "Resize All",
-        //   classes:"tb-resize-all",
-        //   onclick: function() {
-        //     var all = $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb");
-        //     if(all.hasClass('tinyBlocksShrinkBlockClass')){
-        //       all.removeClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
-        //     }
-        //     else{
-        //       all.addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
-        //     }
-        //   }
-        // },
         {
           icon: false,
-          text: "Add/edit Title",
+          text: "Add/edit Title (t)",
           classes:"tb-title-spacer",
-          onclick: function() {
-           var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb");
-            var thisTitle = $(".mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-title");
-            var rowAction = function(btn, text) {
-              if(btn == "ok"){
-                if(text){
-                  // var text = text.replace(/\s/g, "-").replace(/'|\"/g, "");
-                  var text = text.replace(/'|\"/g, "");
-                  thisRow.attr("data-tb-title", text);
-                  thisTitle.text(text);
-                }
-                else{
-                  thisRow.removeAttr("data-tb-title");
-                  thisTitle.text("");
-                }
-              }
-            }
-            Ext.MessageBox.prompt("Title","<span id=tb-alert-title>Special Characters are removed</span>",rowAction);
-            $(".ext-mb-input").val(thisRow.attr("data-tb-title"));
-          }
+          onclick: tinyBlocksTitle
         },
         {
           icon: false,
-          text: "Quick Insert",
-          classes: "tb-block-shortcut",
-          menu: tinyBlocksShortcut
+          text: "Gallery (g + 1)",
+          classes: "tb-block-gallery",
+          onclick: tinyBlocksGalleryTinyJSON
+        },
+        {
+          icon: false,
+          text: "Quick Insert (1-9)",
+          classes: "tb-block-shortcut quickInsert",
+          menu: tinyBlocksShortcut,
+          onPostRender: function(){
+            if(!tinyBlocksShortcut.length){
+              $(".mce-quickInsert").remove();
+            }
+          }
         }
       ]
     }).renderTo(document.getElementById("tinyBlocksControlButtonsWrapper"));
@@ -917,10 +1372,10 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
     // $(document).on("mouseenter", ".tb-title", function(){
     //   $("#" + tinyBlocksMainWrapperId + " .tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
     // });
-    $("#"+tinyBlocksMainWrapperId).on("click", ".tinyBlocksRowsWrapperClass .tb-select", function(){
+    $("#"+tinyBlocksMainWrapperId).on("click", ".tb-select", function(){
       if(tinyBlocksClickReady){
         tinyBlocksMouseHoverTraffic = 0;
-        var par = $(this).parents(".tinyBlocksRowTempHolderClass");
+        var par = $(this).parent(".tinyBlocksRowTempHolderClass");
         if (par.hasClass("ui-selected")){
           par.removeClass("ui-selected");
         }
@@ -929,9 +1384,9 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         }
       }
     });
-    $("#"+tinyBlocksMainWrapperId).on("dblclick", ".tinyBlocksRowsWrapperClass .tb-select", function(){
+    $("#"+tinyBlocksMainWrapperId).on("dblclick", ".tb-select", function(){
       if(tinyBlocksClickReady){
-        var par = $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowTempHolderClass");
+        var par = $(this).parent().parent().find(".tinyBlocksRowTempHolderClass");
         if (par.hasClass("ui-selected")){
           par.removeClass("ui-selected");
         }
@@ -940,7 +1395,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         }
       }
     });
-    $("#"+tinyBlocksMainWrapperId).on("click", ".tb-wrapper-tlb", function(){
+    $("#"+tinyBlocksMainWrapperId).on("click", ".tb-wrapper-tlb, [class^=tb-tiny-]", function(){
       tinyBlocksMouseHoverTraffic = 0;
       var $this = $(this);
       $this.removeClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
@@ -948,8 +1403,9 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         $this.prev(".tb-spacer").removeClass(tinyBlocksNewBlockClass + " tinyBlocksNewBlockClass");
       }, 2500);
     });
-    $("#"+tinyBlocksMainWrapperId).on("mouseenter click", ".tinyBlocksRowsWrapperClass .tinyBlocksRowTempHolderClass", function(){
-      if(tinyBlocksMouseHoverTraffic == 0 && !$(".mce-tinyBlocksTools-menu:visible").length){
+    // $("#"+tinyBlocksMainWrapperId).on("mouseenter click", ".tinyBlocksRowsWrapperClass .tinyBlocksRowTempHolderClass:not(.tb-nested)", function(){
+    $("#"+tinyBlocksMainWrapperId).on("mouseenter click", ".tinyBlocksRowTempHolderClass", function(){
+      if(tinyBlocksMouseHoverTraffic === 0 && !$(".mce-tinyBlocksTools-menu:visible").length){
         $(".mce-tinyBlocksTools").prependTo($(this)).show();
         $(".tinyBlocksActive").removeClass("tinyBlocksActive");
         $(this).addClass("tinyBlocksActive");
@@ -966,7 +1422,8 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         par.removeAttr("data-tb-title");
       }
     });
-    $("#"+tinyBlocksMainWrapperId).on("keyup",function(e){
+    // $("#"+tinyBlocksMainWrapperId).on("keyup",function(e){
+    $(document).on("keyup",function(e){
       if(e.keyCode == 27){
         $("#"+tinyBlocksMainWrapperId + " [contenteditable]").blur();
         window.getSelection().removeAllRanges();

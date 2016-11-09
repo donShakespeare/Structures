@@ -1,35 +1,53 @@
 <div class="tb-guide">
-  <p style="text-align: center;"><a href="https://github.com/donShakespeare/Structures" target="_blank">Official Structure's Wiki</a></p>
-  <p><strong>Structures Content Area:</strong></p>
+  <p><strong>Structures Content Area</strong></p>
   <ol>
-    <li>Click or drag a structure title from the Structures Tree or use keys <kbd>1</kbd> through <kbd>9</kbd></li>
-    <li>Blur structure so that keyboard shortcuts can work; use <kbd>ESC</kbd> key or click outside structures boundary line</li>
-    <li>Rearrange your structures by dragging its Index Number (on the left) or use <kbd>UP</kbd> and <kbd>DOWN</kbd> arrow keys</li>
+    <li>Blur structure to activate keyboard shortcuts; use <kbd>esc</kbd> key or click outside structures outermost dashed boundary lines</li>
+    <li>Click or drag a structure title from the Structures Tree or use keys <kbd>1</kbd> through <kbd>9</kbd> - use <kbd>alt</kbd> to extend beyond 9</li>
+    <li>Rearrange your structures by dragging its Index Number (on the left) or use <kbd>up</kbd> and <kbd>down</kbd> arrow keys</li>
     <li>Click the same Index Number to select/deselect a structure</li>
-    <li>Double-click same Index Number to select/deselect all structures, or use <kbd>A</kbd></li>
+    <li>Double-click same Index Number to select/deselect all structures, or use <kbd>a</kbd></li>
     <li>Click outside structures and drag across single or multiple structures to select them</li>
-    <li>Click top of structure to enter a title (or use the Drop Arrow button next to the Index Number)</li>
+    <li>Click top of structure to enter a title (t) - or use the Drop Arrow button next to the Index Number</li>
+    <li>To associate a Chunk (from element tree) or loaded resource TV, simply add - TV23 or CH23 to the title of your inserted structure, then run "Gallery" (g + 1) from your menu button</li>
   </ol>
   <br>
   <p><strong>Drop Arrow Button</strong></p>
   <p>This button appears upon hover of each row, and thus signifies the active structure to which its menu is referring</p>
+  <p>If there is only one structure this button becomes absent, but its functions can still be keyboarded</p>
   <br>
-  <p><strong>Misc / Clear / Save Buttons</strong></p>
-  <p><strong>Clear</strong> can also delete only selected structures. It defaults to permanently removing all structures from the face of the planet.</p><br>
+  <p><strong>Structures Main Menu / Save Buttons</strong></p>
+  <p><strong>Delete</strong> can also delete only selected structures. It defaults to permanently removing all structures from the face of the planet</p>
+  <p><strong>Import</strong>: you will see your existing content in the source (<kbd>s</kbd>) textarea, or paste fresh content. <br>Make sure your content contains the official Structures MODX comment tags, that is, [[-STRUCTURES]] or [[-STRUCTURES-SINGLE]]<br>
+   - Paste <i>[[-STRUCTURES-SINGLE]]</i> for only one block.<br>
+   - Paste <i>[[-STRUCTURES]]</i> as many times where you want your content to be broken into blocks<br>
+  When ready, hit Import (<kbd>i + m</kbd>)<br><br>
+  <b>NOTE!</b> Structures uses the HTML in your <b>st.importWrapper_tpl</b> and <b>st.importMarker_tpl</b> chunks to decide what kind of editor to use<br><br>
+  You may automatically accomplish this process of import/save resource by carefully selecting the import options in your Template's properties</p><br>
   <p><strong>Keyboard Shortcuts</strong></p>
   <ol>
-    <li><kbd>ESC</kbd> = Blur all Editors so that Keyboard shortcuts can work</li>
-    <li><kbd>Ctrl</kbd> + <kbd>S</kbd> = Save Resource</li>
-    <li><kbd>H</kbd> = Help Modal</li>
-    <li><kbd>HOME</kbd> = Toggle Distraction-free Mode</li>
-    <li><kbd>UP</kbd> / <kbd>DOWN</kbd> arrows = Move "this structure"</li>
-    <li><kbd>C</kbd> = Duplicate "this structure"</li>
-    <li><kbd>DEL</kbd> followed by <kbd>1</kbd> = Delete "this structure"</li>
-    <li><kbd>DEL</kbd> followed by <kbd>A</kbd> = Delete All structure(s)</li>
+    <li><kbd>esc</kbd> = Blur all Editors (or click outside) to activate Shortcuts</li>
+    <li><kbd>ctrl</kbd> + <kbd>s</kbd> = Save Resource</li>
+    <li><kbd>ctrl</kbd> + <kbd>l.click</kbd> = insert P in difficult areas of RTE</li>
+    <li><kbd>b</kbd> = Debug (shows structures detail in sidebar)</li>
+    <li><kbd>h</kbd> = Help / How-to Modal Window</li>
+    <li><kbd>home</kbd> = Toggle Distraction-free Mode</li>
+    <li><kbd>up</kbd> / <kbd>down</kbd> arrows = Move "this structure"</li>
+    <li><kbd>c</kbd> = Duplicate "this structure"</li>
+    <li><kbd>del</kbd> + <kbd>1</kbd> = Delete "this structure"</li>
+    <li><kbd>del</kbd> + <kbd>a</kbd> = Delete All/Selected structure(s)</li>
     <li><kbd>-</kbd> / <kbd>+</kbd> = Shrink / Expand all structure(s)</li>
-    <li><kbd>1</kbd> through <kbd>9</kbd> = Quick Insert first NINE HTML template structures</li>
-    <li><kbd>M</kbd> = Misc : Open environment for Importing/converting</li>
-    <li><kbd>I</kbd> followed by <kbd>M</kbd> = To actually import/convert</li>
+    <li><kbd>0</kbd> = Total Count number of inserted structures</li>
+    <li><kbd>1</kbd> through <kbd>9</kbd> = Quick Insert of first NINE HTML template structures</li>
+    <li><kbd>alt</kbd> + single/double digits = Extends beyond first 9. Also, when a Rich Text Editor has focus, inserted structure becomes embedded</li>
+    <li><kbd>s</kbd> = Content Source and Import Manager</li>
+    <li><kbd>i</kbd> + <kbd>m</kbd> = To actually import/convert</li>
+    <li><kbd>t</kbd> = Enter title for "this structure" - add ch23 or tv23 to associate a gallery</li>
+    <li><kbd>g</kbd> + <kbd>1</kbd> = Activate gallery for "this structure"</li>
+    <li><kbd>g</kbd> + <kbd>g</kbd> = Activate Global Gallery (after which you can dblclick any Resource TV or any quick-updated Chunk from Element Tree</li>
+    <li><kbd>g</kbd> + <kbd>t</kbd> = Activate Default TV Gallery - of TV prespecified in Template Properties</li>
+    <li><kbd>d</kbd> = Disable Structures temporarily for this resource</li>
+    <li><kbd>r</kbd> + <kbd>t</kbd> = Quick Random Tip (per page load)</li>
   </ol>
-  Yours gratefully, donShakespeare
+  <p style="text-align: center;">Yours imaginatively,<br> donShakespeare<br><a href="https://github.com/donShakespeare/Structures" target="_blank">https://github.com/donShakespeare/Structures</a></p>
+  
 </div>
