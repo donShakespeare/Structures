@@ -128,6 +128,7 @@ if ($id !== 0){
         $standByStructure = $modx->getOption("standByStructure", $getVariousSettings);
         $randomTips = $modx->getOption("randomTips", $getVariousSettings);
         $defaultGalleryTVid = $modx->getOption("defaultGalleryTVid", $getVariousSettings);
+        $structuresTV_ids = $modx->getOption("structuresTV_ids", $getVariousSettings);
         $pure = $modx->getOption("pureContent", $getVariousSettings, '');
         $sidebar_tab_title = $modx->getOption("sidebar_tab_title", $getVariousSettings, $cognomen);
         $content_tab_title = $modx->getOption("content_tab_title", $getVariousSettings, $cognomen);
@@ -139,7 +140,6 @@ if ($id !== 0){
         $ace_mirror_init_chunk = $modx->getOption("ace_mirror_init_chunk", $getVariousSettings);
         $all_structures_chunk = $modx->getOption("all_structures_chunk", $getVariousSettings);
         // $blocks_reel_chunk = $modx->getOption("blocks_reel_chunk", $getVariousSettings);
-        $content_wrapper_chunk = $modx->getOption("content_wrapper_chunk", $getVariousSettings);
         $manager_misc_buttons_chunk1 = $modx->getOption("manager_misc_buttons_chunk", $getVariousSettings);
         // $tb_autoFileBrowser = $modx->getOption("tb_autoFileBrowser", $getVariousSettings, 'MODx.config["manager_url"] + "index.php?a=" + MODx.action["browser"] + "&source=" + MODx.config["default_media_source"]'); //???
         $autoImport = $modx->getOption("autoImport", $getVariousSettings, false);
@@ -162,6 +162,32 @@ if ($id !== 0){
         $showDebugInfo = $modx->getOption("showDebugInfo", $getVariousSettings, true);
         $help = $modx->getOption("help_howto_chunk", $getVariousSettings);
 
+
+        $stTVs ="";
+        $stComma = "";
+        $structuresTV_ids = str_replace(' ', '', $structuresTV_ids);
+        // $structuresTV_ids = preg_replace("/[^0-9,]+/i", '', $structuresTV_ids);
+        $structuresTV_ids = preg_replace("/[^A-Za-z0-9,*]+/i", '', $structuresTV_ids);
+        $structuresTV_ids = explode(',', $structuresTV_ids);
+        if($structuresTV_ids){
+          foreach ($structuresTV_ids as $structuresTV_id) {
+            $structuresTV_id = explode('*', $structuresTV_id);
+            if(isset($structuresTV_id[1])){
+             $structuresTV_id[1] = "***".$structuresTV_id[1];
+            }
+            else{
+             $structuresTV_id[1] = "";
+            }
+            if(isset($structuresTV_id[0])){
+              if($getTV = $modx->getObject('modTemplateVar', $structuresTV_id[0])){
+                $getTVname = $getTV->get("name");
+                $stTVs .= $stComma.$getTVname ."***". $structuresTV_id[0].$structuresTV_id[1];
+                $stComma = ",";
+              }
+            }
+          }
+        }
+
         $miscInfo = "
         <!--<span><b>originalSourceId</b><i>". $originalSourceId . "</i></span>
         <span><b>mainWrapperId</b><i>tinyBlocksMainWrapperId_". $originalSourceId . "</i></span>
@@ -181,7 +207,6 @@ if ($id !== 0){
         <span class='imp'><b>tinymce_init_chunk</b><i>". $tinymce_init_chunk . "</i></span>
         <span><b>ace_mirror_init_chunk</b><i>". $ace_mirror_init_chunk . "</i></span>
         <span><b>all_structures_chunk</b><i>". $all_structures_chunk . "</i></span>
-        <span><b>content_wrapper_chunk</b><i>". $content_wrapper_chunk . "</i></span>
         <span><b>manager_misc_buttons_chunk</b><i>". $manager_misc_buttons_chunk1 . "</i></span>
         <span><b>import_wrapper_chunk</b><i>". $import_wrapper_chunk . "</i></span>
         <span><b>import_marker_chunk</b><i>". $import_marker_chunk . "</i></span>
@@ -270,7 +295,7 @@ if ($id !== 0){
         shuffle($randomTip);
 
         //moved silly st.wrapper_tpl to right here (one less pesky getChunk to deal with- we want speed)!
-        $sourceContent = "<div class='st-html'><div id=tinyBlocksMainWrapperId_".$originalSourceId." class=st-body><div class=".$rowsWrapperClass.">".$resourceContent."</div></div></div>";
+        $sourceContent = "<div class='st-html'  tabindex=0><div id=tinyBlocksMainWrapperId_".$originalSourceId." class=st-body  tabindex=0><div class=".$rowsWrapperClass."  tabindex=0 spellcheck=true>".$resourceContent."</div></div></div>";
         $sourceContent = json_encode($sourceContent);
 
         if($importWrapperJS = $modx->getObject("modChunk", array("name" => $import_wrapper_chunk))){
@@ -278,7 +303,7 @@ if ($id !== 0){
         }
 
         $blockControlSideBar = json_encode($blockSnippetBar.$blockSnippetBase);
-        if($content_tab_title == "hidden"){
+        if(!$content_tab_title || $content_tab_title == "hidden"){
           $showHideContentTab = '
           $("#'.$originalSourceId.'").hide().before('.$sourceContent.');
           ';
@@ -301,7 +326,7 @@ if ($id !== 0){
           $("#modx-resource-content, #modx-panel-resource .x-tool.x-tool-toggle").hide();
           ';
         }
-        if($sidebar_tab_title == "hidden"){
+        if(!$sidebar_tab_title || $sidebar_tab_title == "hidden"){
           $showHideTreeTab = "
           tabs.insert(12,newPanelSideBar);
           tabs.setActiveTab(newPanelSideBar);
@@ -362,10 +387,12 @@ if ($id !== 0){
               "thisPageUrl":  "'.MODX_MANAGER_URL.'?a=resource/update&id='.$id.'",
               "randomTip":  '.json_encode($randomTip[0]).',
               "defaultGallery":  "'.$defaultGalleryTVid.'",
+              "TVs":  "'.$stTVs.'",
               "pure":  "'.$pure.'",
               "help": '.json_encode($help).',
               "projectName": "'.$cognomen.'"
             }
+            TinyJSONGalleryDefaultTV = "'.$defaultGalleryTVid.'";
             TinyJSONGalleryBase = "'.MODX_BASE_URL.'";
             TinyJSONGalleryGallery = "'.MODX_ASSETS_URL.'components/structures/gallery/";
             TinyJSONGalleryGallerySkin = "'.$tinymce_skin_url.'";

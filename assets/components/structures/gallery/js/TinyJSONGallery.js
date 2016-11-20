@@ -12,6 +12,7 @@ TinyJSONGallery.version = "2.0";
 TinyJSONGallery.base_url = TinyJSONGalleryBase;
 TinyJSONGallery.gallery_url = TinyJSONGalleryGallery;
 TinyJSONGallery.tinymce_skin_url = TinyJSONGalleryGallerySkin;
+TinyJSONGallery.default_tv = TinyJSONGalleryDefaultTV;
 
 if (TinyJSONGallery.gallery_url.indexOf(TinyJSONGallery.base_url) >= 0 && TinyJSONGallery.base_url.length > 1) {
   TinyJSONGallery.gallery_rel_url = TinyJSONGallery.gallery_url.substr(TinyJSONGallery.gallery_url.lastIndexOf(TinyJSONGallery.base_url) + TinyJSONGallery.base_url.length);
@@ -38,13 +39,7 @@ scriptLoader.add("https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort
 
 scriptLoader.add("https://cdnjs.cloudflare.com/ajax/libs/jquery-tagsinput/1.3.6/jquery.tagsinput.min.js");
 
-
-$(document).on("dblclick", "#mce-modal-block", function() {
-  $(this).fadeOut();
-  var tabs = Ext.getCmp("modx-leftbar-tabpanel");
-  var propertiesTab = tabs.find("id","modx-file-tree");
-  tabs.setActiveTab(propertiesTab[0]);
-});
+$(document).on("dblclick", "#mce-modal-block", gallOpenFileTree);
 $(document).on("focus", ".mce-gal-add-images input:visible", function() {
   $(".temp-gal-add-file").removeClass("temp-gal-add-file");
   $(this).addClass("temp-gal-add-file");
@@ -111,6 +106,18 @@ jQuery.fn.fastLiveFilter = function(getAttr, list, options) {
   });
   return this;
 };
+
+function gallOpenFileTree() {
+  if($(".mce-popGal").length && $("#mce-modal-block:visible").length){
+    $("#mce-modal-block").fadeOut();
+    if (!$('#modx-leftbar:visible').length) {
+      $(".x-layout-mini.x-layout-mini-west").trigger("click");
+    }
+    var tabs = Ext.getCmp("modx-leftbar-tabpanel");
+    var propertiesTab = tabs.find("id","modx-file-tree");
+    tabs.setActiveTab(propertiesTab[0]);
+  }
+}
 
 function toggleLiveEdit(editor) {
   if (galleryLiveEdit == 1) {
@@ -273,7 +280,7 @@ function rebuildGalleryAddFiles(){
   var json2 = JSON.parse(jsonSrc);
   var result = json1.concat(json2);
   editor.setContent(JSON.stringify(result));
-  rebuildFromCurrent(editor, tinyBlocksDefaultGallery);
+  rebuildFromCurrent(editor, TinyJSONGallery.default_tv);
   galleryModified(1);
 }
 function rebuildGalleryFromMODX(data, fileElements, origin, autoCreateThumb){
@@ -319,7 +326,7 @@ function rebuildGalleryFromMODX(data, fileElements, origin, autoCreateThumb){
   }).removeClass("gal-ready-tree");
   jsonSrc += "]";
   editor.setContent(jsonSrc);
-  rebuildFromCurrent(editor, tinyBlocksDefaultGallery, autoCreateThumb); //removed wizard???
+  rebuildFromCurrent(editor, TinyJSONGallery.default_tv, autoCreateThumb); //removed wizard???
   galleryModified(1);
 }
 function rebuildFromServer(editor) {
@@ -363,14 +370,11 @@ function addCommas(num) {
 function tinyDesc(editor) {
   tinymce.init({
     selector: ".mce-newDesc",
-    // fixed_toolbar_container: "#descToolbar",
-    fixed_toolbar_container: "#tinyBlocksBubbleBar",
     skin_url: TinyJSONGallery.tinymce_skin_url,
     menubar: false,
     plugins: "bubbleBar contextmenu code",
     toolbar: "code undo redo bold italic underline ",
     forced_root_block: "",
-    inline: true,
     contextmenu: "code undo redo bold italic underline ",
     setup: function(editor) {
       editor.on("change keyup", function() {
@@ -666,37 +670,21 @@ function updateChunk(modx, textareaForJSON, callback) {
         array.push(arrayItem);
       });
       if (beautifyJSON == 1) {
-        $("#" + textareaForJSON).val(JSON.stringify(array, null, 4)).change();
-        tinymce.get("tinyJSONfield").setContent(JSON.stringify(array, null, 4));
-        galleryModified(0);
+        // $("#" + textareaForJSON).val(JSON.stringify(array, null, 4)).change();
+        // tinymce.get("tinyJSONfield").setContent(JSON.stringify(array, null, 4));
+        // galleryModified(0);
       } else {
-        $("#" + textareaForJSON).val(JSON.stringify(array)).change();
+        $(".galleryXTYPEtv"+TinyJSONGallery.default_tv).attr("id",textareaForJSON);
+        if ($("input.galleryXTYPEtv"+TinyJSONGallery.default_tv+"[type=hidden]").length) { //for hidden TVS
+          // $("#" + textareaForJSON).val(JSON.stringify(array)).removeAttr("id");
+          Ext.get(textareaForJSON).set({value: JSON.stringify(array), id: "galleryXTYPEtv"+TinyJSONGallery.default_tv}); //only way so far to alter val of hidden TV: .dom.value
+          console.log("cause ExtJS 'dom' of null error to prevent MODX from resetting TV Gallery data");
+        }
+        else{
+          $("#" + textareaForJSON).val(JSON.stringify(array)).change().attr("id", "galleryXTYPEtv"+textareaForJSON);
+        }
         tinymce.get("tinyJSONfield").setContent(JSON.stringify(array));
         galleryModified(0);
-      }
-      hiddenTVMODX = JSON.stringify(array);
-      if ($("input#" + textareaForJSON + "[type=hidden]").length && !$("input#" + textareaForJSON + "[type=hidden]").hasClass('gallery-set-aside')) { //for hidden silly TVS
-        $("input#" + textareaForJSON + "[type=hidden]").addClass('gallery-set-aside');
-        Ext.get(textareaForJSON).set({'value': JSON.stringify(array)});
-        MODx.fireResourceFormChange();
-        // <![CDATA[
-        MODx.on('ready',function() {
-          Ext.get(textareaForJSON).set({'value': JSON.stringify(array)});
-          MODx.fireResourceFormChange();
-          var fld = MODx.load({
-            xtype: 'hidden',
-            applyTo: textareaForJSON,
-            value: hiddenTVMODX,
-            listeners: { 'change': { fn:MODx.fireResourceFormChange, scope:this}}
-          });
-        console.log("hidddddddd");
-          var p = Ext.getCmp('modx-panel-resource');
-          if (p) {
-            p.add(fld);
-            p.doLayout();
-          }
-        });
-        //]]>
       }
       if (modx) {
         $("#modx-abtn-save button").trigger("click");
@@ -849,8 +837,8 @@ function tagManager(editor) {
             }).parent().css("background-color");
             if ($("#list_to_filter .ui-selected").length) {
               // var hasSelected = $("#list_to_filter .ui-selected").length;
-              $(".ui-selected, .ui-selected a").attr("data-tag", ctag);
-              $(".ui-selected .tagger").css("background-color", tagBg).attr("data-tag", ctag).html(ctag).fadeIn();
+              $("#list_to_filter .ui-selected, #list_to_filter .ui-selected a").attr("data-tag", ctag);
+              $("#list_to_filter .ui-selected .tagger").css("background-color", tagBg).attr("data-tag", ctag).html(ctag).fadeIn();
               tagClickReset();
               runFilter("data-tag");
               $("#filter_input").val(ctag).change();
@@ -1073,7 +1061,7 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
         tinymce.ui.Factory.create({
           type: "button",
           classes: "moreAttr",
-          tooltip: "Enlarge image, hide, delete, edit tags, title and description etc ...",
+          tooltip: "Toggle menu",
           onPostRender: function() {
             $(".mce-moreAttr").html("<i class='mce-caret'></i>");
           },
@@ -1090,8 +1078,13 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
         tinymce.ui.Factory.create({
           type: "menu",
           classes: "moreAttrMenu",
+          hidden: false,
           onPostRender: function() {
-            $(".mce-moreAttrMenu").css("display", "block!important");
+            setTimeout(function(){
+              $(".mce-moreAttrMenu").css("display", "block!important");
+              $(".mce-moreAttrMenu").fadeIn();
+
+            },300);
           },
           items: [ {
             tooltip: "Enlarge",
@@ -1101,7 +1094,7 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
               $(".mce-zoomPic").parents("li").find("a").trigger("click");
             }
           }, {
-            tooltip: "Edit all Image Info at once",
+            tooltip: "Edit all properties",
             icon: "image",
             classes: "srcC",
             onclick: function() {
@@ -1113,7 +1106,7 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
             classes: "eTitles",
             onclick: function() {
               $(".mce-eTitles").parents("li").addClass("ui-selected");
-              if ($(".ui-selected").length) {
+              if ($("#list_to_filter .ui-selected").length) {
                 tinymce.init({
                   selector: ".ui-selected .twgTitle",
                   skin_url: TinyJSONGallery.tinymce_skin_url,
@@ -1133,7 +1126,7 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
               } else {
                 editor.windowManager.alert("No image was selected");
               }
-              var countSelected2 = $(".ui-selected").length;
+              var countSelected2 = $("#list_to_filter .ui-selected").length;
               editor.windowManager.alert("Titles made editable: " + countSelected2);
             }
           }, {
@@ -1143,16 +1136,20 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
             onclick: function() {
               var hideMe = $(".mce-hidePic").parents("li");
               hideMe.addClass("ui-selected");
-              var countSelectedH = $(".ui-selected").length;
-              if ($(".ui-selected a").attr("data-hidden") == 1) {
-                $(".ui-selected a").attr("data-hidden", 0);
-                $(".ui-selected").removeClass("galhidden");
-                editor.windowManager.alert("Images unHidden: " + countSelectedH);
+              var countSelectedH = $("#list_to_filter .ui-selected").length;
+              if ($("#list_to_filter .ui-selected a").attr("data-hidden") == 1) {
+                $("#list_to_filter .ui-selected a").attr("data-hidden", 0);
+                $("#list_to_filter .ui-selected").removeClass("galhidden");
+                if(countSelectedH > 1){
+                  editor.windowManager.alert("Images unHidden: " + countSelectedH);
+                }
                 galleryModified(1);
               } else {
-                $(".ui-selected a").attr("data-hidden", 1);
-                $(".ui-selected").addClass("galhidden");
-                editor.windowManager.alert("Images hidden: " + countSelectedH);
+                $("#list_to_filter .ui-selected a").attr("data-hidden", 1);
+                $("#list_to_filter .ui-selected").addClass("galhidden");
+                if(countSelectedH > 1){
+                  editor.windowManager.alert("Images hidden: " + countSelectedH);
+                }
                 galleryModified(1);
               }
             }
@@ -1163,11 +1160,11 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
             onclick: function() {
               var delMe = $(".mce-delPic").parents("li");
               delMe.addClass("ui-selected");
-              var countSelected = $(".ui-selected").length;
+              var countSelected = $("#list_to_filter .ui-selected").length;
               editor.windowManager.confirm("Remove " + countSelected + " permanently? (still on server)", function(s) {
                 if (s) {
                   $("#picSettings").appendTo("#tinyJSONGalleryWrapper").hide();
-                  $(".ui-selected").remove();
+                  $("#list_to_filter .ui-selected").remove();
                   runFilter("data-desc");
                   galleryModified(1);
                 }
@@ -1218,7 +1215,7 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
               },
               menu: [ {
                 text: "Create From File Browser ...",
-                tooltip: "Click to open MODX File Browser; SELECT any image to grab entire folder; hit OKAY",
+                tooltip: "SELECT any image to get folder",
                 onclick: function(){
                   var src = $(".mce-tinyJSONfolder").val() || rebuildLocation("", "url");
                   var stat = $(".mce-tinyJSONfolder").attr("id");
@@ -1226,14 +1223,10 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
                 }
               }, {
                 text: "Create From File Tree ...",
-                tooltip: "First hover any valid image file in File Tree; then click here to add its folder content",
-                // active:true,
                 onclick: function(){
-                  if($("#mce-modal-block:visible").length){
-                    editor.windowManager.alert("Dblclick the overlay to access your MODX File Tree");
-                  }
                   if(!$(".mce-tinyJSONfolder").attr("data-node-id")){
-                    editor.windowManager.alert("Please first hover any image in File Tree before clicking here");
+                    gallOpenFileTree();
+                    editor.windowManager.alert("First, Hover any image in File Tree, then try again");
                   }
                   var location = $(".mce-tinyJSONfolder").val();
                   var id = $(".mce-tinyJSONfolder").attr("data-node-id");
@@ -1243,7 +1236,6 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
                 }
               }, {
                 text: "Add to Existing Gallery ...",
-                tooltip: "Append new images to an existing gallery",
                 onclick: rebuildAddFiles
               }, {
                 text: "Thumbnails",
@@ -1323,7 +1315,7 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
                   text: "Select All (visible items)",
                   icon: "table",
                   onclick: function() {
-                    $(".ui-selected").removeClass("ui-selected");
+                    $("#list_to_filter .ui-selected").removeClass("ui-selected");
                     $("#list_to_filter li:visible").addClass("ui-selected");
                   }
                 }, {
@@ -1359,8 +1351,8 @@ function tinyLord(chunkValOriginal, textareaForJSON) {
             }).renderTo(document.getElementById("tinyJSONfolderWrapper"));
             tinymce.ui.Factory.create({
               type: "textbox",
-              style: "width:80%",
-              tooltip: "Relative URLs only! The address here will be used to generate and maintain your gallery",
+              style: "width:85%",
+              tooltip: "This address will be used to generate and maintain your gallery",
               // autofocus: true,
               classes: "tinyJSONfolder",
               onPostRender: function(){
@@ -1675,7 +1667,7 @@ function tinyGalleryInit(textareaForJSON) {
         });
         editor.on("change keyup", function() {
           // editor.save();
-          // $("#"+textareaForJSON).val(editor.getContent()); //???? add later
+          // $("#"+textareaForJSON).val(editor.getContent()); //???? add later //watch out for ID change
           galleryModified(1);
           if (galleryJSONchanged === 0) {
             if($("#tinyJSONfolder:visible").length){
@@ -1832,6 +1824,7 @@ function tjgClosePopGal() {
   tinymce.EditorManager.execCommand("mceRemoveEditor", true, "tinyFileImageGallery");
   tinymce.EditorManager.execCommand("mceRemoveEditor", true, "tinyJSONfield");
   tinymce.get("tmpTempEditor").windowManager.close();
+  $(".galleryXTYPEtv"+TinyJSONGallery.default_tv).attr("id", "galleryXTYPEtv"+TinyJSONGallery.default_tv);
 }
 
 function createTempEditorManager() {

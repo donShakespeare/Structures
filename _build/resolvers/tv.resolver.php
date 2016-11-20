@@ -50,11 +50,6 @@ if ($object->xpdo) {
 
             $intersects = array (
                 0 =>  array (
-                  'templateid' => 'default',
-                  'tmplvarid' => 'Structures',
-                  'rank' => 0,
-                ),
-                1 =>  array (
                   'templateid' => 'Structures',
                   'tmplvarid' => 'Structures',
                   'rank' => 0,

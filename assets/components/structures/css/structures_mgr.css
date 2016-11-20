@@ -1,5 +1,10 @@
 /* theme color from tinymce skin .mce-panel bg rgba(45, 51, 56, 1) */
 /* Modify MODX just a little tiny bit */
+
+.tb-modx-main-wrapper{
+    padding: 0px;
+}
+
 #modx-abtn-save,#ta{
     display: none !important;
     visibility: hidden !important;
@@ -14,7 +19,7 @@
     z-index: 99999!important;
 }
 
-#modx-header.tinyBlocksDistraction, #modx-action-buttons.tinyBlocksDistraction, #modx-resource-tabs .x-tab-panel-header.x-tab-panel-header-noborder.x-unselectable.x-tab-panel-header-plain.tinyBlocksDistraction {
+#modx-header.tinyBlocksDistraction, #modx-action-buttons.tinyBlocksDistraction, #modx-resource-tabs.tinyBlocksDistraction, #modx-resource-tabs .x-tab-panel-header.x-tab-panel-header-noborder.x-unselectable.x-tab-panel-header-plain.tinyBlocksDistraction, #modx-resource-content > .x-panel-header.tinyBlocksDistraction {
     display: none!important;
 }
 
@@ -27,7 +32,7 @@
 }
 
 .x-window.x-window-plain.x-window-dlg{
-    min-width: 250px!important;
+    min-width: 310px!important;
     width: auto!important;
 }
 .x-window.x-window-plain.x-window-dlg .x-window-body{
@@ -88,7 +93,7 @@ div.tb-gallery-tv:after {
 
 .st-body {
     /* counter-reset: st-row-counter; */
-    padding: 2rem;
+    /* padding: 2rem; */
 }
 
 .st-container-fluid:empty::before,.st-outer::before {
@@ -98,9 +103,16 @@ div.tb-gallery-tv:after {
 .st-container-fluid {
     margin-left: auto;
     margin-right: auto;
-    padding: 0rem 4rem 10rem 4rem;
+    /* padding: 0rem 2.5rem 10rem 2.5rem; */
+    padding: 3.5rem 1.5rem 10rem 3rem;
     min-height: 20rem;
-    border: 0.2rem rgb(241, 241, 241) dashed;
+    /* border: 0.01rem rgb(241, 241, 241) solid;
+    border-radius: 0.1rem; */
+}
+
+/* balance out mssing block menu space added by default st-container-fluid padding */
+.st-container-fluid.tb-lone-block {
+    padding-left: 1.75rem!important;
 }
 
 .tb-guide {
@@ -111,7 +123,7 @@ div.tb-gallery-tv:after {
 }
 
 .tinyBlocksRowsWrapperClass .tb-guide {
-    padding: 0.5rem 2rem 0;
+    padding: 0 2rem 0;
     font-size: 1rem;
     color: #555;
     height: auto;
@@ -163,11 +175,27 @@ div.tb-gallery-tv:after {
 }
 
 #blockSnippetBar ol {
-    list-style-type: decimal!important;
-    list-style-position: inside!important;
+/*     list-style-type: decimal!important;
+    list-style-position: inside!important; */
+    list-style-type: none;
+    counter-reset: structures-counter;
     padding: 2em 0;
     text-align: left;
     color: #555;
+}
+
+#blockSnippetBar ol li {
+    font-size: 0.7rem!important;
+    background-color: #fff!important;
+    border-bottom: 0.15rem rgba(241, 241, 241, 1) dashed;
+}
+
+
+#blockSnippetBar ol li:before {
+    content: counter(structures-counter) ". ";
+    counter-increment: structures-counter;
+    float:left;
+    padding: 0.5rem 0 0 1rem;
 }
 
 #blockSnippetBar ol li {
@@ -189,7 +217,7 @@ div.tb-gallery-tv:after {
     font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif!important;
     font-weight: 500!important;
     line-height: 1.5!important;
-    padding: 0.3rem 0 0.2rem 1.5rem!important;
+    padding: 0.3rem 0 0.2rem 2.2rem!important;
     font-size: 1rem!important;
     text-align: left;
     max-width: 15rem;
@@ -227,20 +255,20 @@ div.tb-gallery-tv:after {
     text-decoration:underline;
 }
 
-#tinyBlocksButtonHolder button {
+#tinyBlocksButtonHolder button, #tinyBlocksTVButtonHolder button {
     padding: 7.5px!important;
     font-style: normal !important;
     font-size: 13px !important;
 }
 
-#tinyBlocksButtonHolder .mce-tinyBlocksButton {
+#tinyBlocksButtonHolder .mce-tinyBlocksButton, #tinyBlocksTVButtonHolder .mce-tinyBlocksButton {
     margin: 0px 0px 0px 7px !important;
     display: none;
     border: 0;
     /* background: #fff; */
 }
 
-#tinyBlocksButtonHolder .mce-txt {
+#tinyBlocksButtonHolder .mce-txt, #tinyBlocksTVButtonHolder .mce-txt {
     vertical-align: middle;
 }
 
@@ -253,7 +281,13 @@ div.tb-gallery-tv:after {
 }
 
 .st-outer.tb-nested-yes {
-    counter-increment: st-row-counter-nested
+    counter-increment: st-row-counter-nested;
+/*     -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; */
 }
 
 /* .tb-lone-block .tb-ui-drag-handle{
@@ -282,10 +316,14 @@ div.tb-gallery-tv:after {
   background: #f7f7f9!important;
 } */
 .tb-spacer {
-    margin-top: 4rem!important;
+    /* margin-top: 4rem; */
     display: block!important;
     position: relative;
     height: 1rem;
+}
+
+.st-outer:first-of-type .tb-spacer{
+    margin-top:0rem
 }
 
 .tb-spacer:hover {
@@ -343,13 +381,15 @@ transition: background-color 0.10s ease-in-out;
 .st-outer {
     position: relative;
     padding: 0 !important;
-    margin: 0;
+    /* margin: 0; */
+    margin: 0 0 3.5rem 0;
 }
 
 .tinyBlocksHTMLwrapper {
     margin-left: auto;
     margin-right: auto;
-    padding: 0rem 4rem 4rem 4rem;
+    /* padding: 2rem 4rem 4rem 4rem; */
+    padding: 2rem 4rem 0 4rem;
 }
 
 .tinyBlocksHTML {
@@ -529,8 +569,12 @@ transition: background-color 0.10s ease-in-out;
 
 .st-html .ui-state-highlight {
     display: block!important;
-    height: 4rem;
-    margin-top: 3rem;
+    /* height: 4rem;
+    margin-top: 3rem; */
+    height: 5rem;
+    /* margin-top:3rem;
+    margin-bottom: 5rem; */
+    margin: 1.5rem 0 5rem 0;
     border: 0.2rem rgba(241, 241, 241, 1) dashed;
 }
 
@@ -591,7 +635,9 @@ transition: background-color 0.10s ease-in-out;
 }
 
 .tb-ui-multiple-select, .tb-ui-single-select:not(.tb-ui-drag-helper) {
+    /* padding-top: 1rem!important; */
     padding-top: 1rem!important;
+    margin-top:-1.5rem;
 }
 
 .tb-ui-multiple-select .tb-spacer, .tb-ui-single-select .tb-spacer {

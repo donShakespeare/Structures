@@ -31,7 +31,7 @@ $templateVars[1]->fromArray(array (
   'property_preprocess' => false,
   'type' => 'hidden',
   'name' => 'Structures',
-  'caption' => 'StructuresCMR',
+  'caption' => 'Structures Wonderful TV',
   'description' => 'Structures Plugin fires on OnDocFormPrerender and only when said Resource has a MODX Template attached to this hidden TV.',
   'elements' => '',
   'rank' => 0,

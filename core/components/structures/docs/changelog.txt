@@ -1,4 +1,40 @@
 Changelog file for Structures extra.
+https://github.com/donShakespeare/Structures/blob/master/core/components/structures/docs/changelog.txt
+
+# Structures 3.1.0-beta1 (November 20, 2016)
+=======================================
+
+# List of exciting new features
+
++ RESTORE STRUCTURES CONTENT
+ - Restore from Original content
+ - Restore from Last Saved
+
++ TEMPLATE VARIABLES
+ - ADDDED *structuresTV_ids* to Template Properties
+    Takes comma-separated list of ids of TVs to bind to Structures. Two Modes:
+    1) 12,13,14,15 ... (choose Editors on the fly)
+    2) 12*richtext, 13*markdown, 14*markdown, 15*richtext ... (predetermined structure/editors)
+  Supported TV xtypes: Hidden, Textarea, Text
+  Say byebye to the TV tab altogether
+ - ADDED optional <td class="x-toolbar-cell" id="tinyBlocksTVButtonHolder"></td> to *st.save_buttons* chunk
+    access TVs from each block menu, Structures main menu, or dedicated TV list menu
+
++ STRUCTURES GALLERY
+ - ADDED full support for TV xtype: Hidden (sweeeeet!)
+ - UI clean up
+
++ STRUCTURES CONTENT ENVIRONMENT
+ - ADDED spellcheck attribute on body
+ - REMOVED external dash border: replaced with click-to-blur-structures functionality
+ - REVERTED back to more stable version of twExoticMarkdownEditor.js(v1)
+ - FIXED Structures Tree in Firefox
+ - DISABLED selectable in nested structures
+
++ TO DO
+ - Fix silly Ace conflict
+
+
 
 # Structures 3.0.0-beta1 (November 8, 2016)
 =======================================

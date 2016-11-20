@@ -85,18 +85,6 @@ $properties = array (
     'lexicon' => NULL,
     'area' => '1. Advanced and Experimental',
   ),
-  'defaultGalleryTVid' => 
-  array (
-    'name' => 'defaultGalleryTVid',
-    'desc' => 'TV id that is loaded with resource that you want to be ya gallery.',
-    'type' => 'numberfield',
-    'options' => 
-    array (
-    ),
-    'value' => '',
-    'lexicon' => NULL,
-    'area' => '1. Advanced and Experimental',
-  ),
   'autoImportSave' => 
   array (
     'name' => 'autoImportSave',
@@ -105,7 +93,7 @@ $properties = array (
     'options' => 
     array (
     ),
-    'value' => true,
+    'value' => false,
     'lexicon' => NULL,
     'area' => '1. Advanced and Experimental',
   ),
@@ -129,9 +117,33 @@ $properties = array (
     'options' => 
     array (
     ),
-    'value' => true,
+    'value' => false,
     'lexicon' => NULL,
     'area' => '1. Advanced and Experimental',
+  ),
+  'structuresTV_ids' => 
+  array (
+    'name' => 'structuresTV_ids',
+    'desc' => 'Comma-separated list of ids of TVs to bind to Structures. Two Modes: 1) 12,13,14,15 ... 2) 12*richtext, 13*markdown, 14*markdown, 15*richtext ... Supported TV xtypes: Textarea, Text, Hidden.',
+    'type' => 'textfield',
+    'options' => 
+    array (
+    ),
+    'value' => '',
+    'lexicon' => NULL,
+    'area' => '1. Advanced and Experimental TVS',
+  ),
+  'defaultGalleryTVid' => 
+  array (
+    'name' => 'defaultGalleryTVid',
+    'desc' => 'TV id for default Resource Gallery.',
+    'type' => 'numberfield',
+    'options' => 
+    array (
+    ),
+    'value' => '',
+    'lexicon' => NULL,
+    'area' => '1. Advanced and Experimental TVS',
   ),
   'tinymce_init_chunk' => 
   array (
@@ -220,7 +232,7 @@ $properties = array (
   'sidebar_tab_title' => 
   array (
     'name' => 'sidebar_tab_title',
-    'desc' => 'The sidebar tab title - which is first in line. To hide this panel set the name to: hidden. All your structures will still be available via shortcuts and dropdown menus.',
+    'desc' => 'The tab title for Structures Tree. Set to hidden or empty to hide this panel. All your structures will still be available via shortcuts and dropdown menus.',
     'type' => 'textfield',
     'options' => 
     array (
@@ -232,7 +244,7 @@ $properties = array (
   'content_tab_title' => 
   array (
     'name' => 'content_tab_title',
-    'desc' => 'The tab title for resource content area. Set to hidden to use default MODX content area.',
+    'desc' => 'The tab title for resource content area. Set to hidden or empty to use default MODX content area.',
     'type' => 'textfield',
     'options' => 
     array (

@@ -57,11 +57,11 @@ function gallery($inputedPath, $autoCreateThumb, $justJSON, $options, $doThumbs,
   // $thumbParentUrl = dirname($largeUrl) . "/";
   $thumbParentUrl = $largeUrl;
   $thumbUrl = $thumbParentUrl . $thumbFld;
-  $thumbInfo = '';
+  $thumbInfo = $thumbReady = '';
   if ($autoCreateThumb == 1 && $options !== 0) {
     $thumbUrl = $largeUrl . $thumbFld;
     if ($justJSON == 0) {
-      $thumbInfo = '<br><b>THUMBNAILS</b> <i>have been regenerated in thumb folder</i>';
+      $thumbReady = 1;
     }
   }
 
@@ -137,7 +137,9 @@ function gallery($inputedPath, $autoCreateThumb, $justJSON, $options, $doThumbs,
         $output.= $comma . '{"id":"' . $file.'.'.$ext .'","title":"' . $file.'.'.$ext . '","folder":"' . $thumbParentUrl . '","hidden":"0","desc":"' . $cleanfile . '","index":"' . $index . '","tag":"","lerror":"0"}';
         $comma = ',';
       }
-      $thumbInfo .= "<br><br>" . $index . " thumb image(s) created in: <br><i>" . $inputedPath . $thumbFld . "</i><br><br>If there is any mismatch, your original images may have been oversize";
+      if($thumbReady){
+        $thumbInfo = "<br><b>THUMBNAILS:</b> " . $index . " thumb image(s) created in: <br><i>" . $inputedPath . $thumbFld . "</i><br><br>If any issues, check that the original images were not oversize";
+      }
       $output.= "]</div><br><b>COPY CODE ABOVE</b> <i>and paste over your current JSON, and then press the option 'Build from Current JSON'</i><br>".$thumbInfo;
       if($doThumbs){
         return $thumbInfo;

@@ -63,7 +63,7 @@ $.fn.alterClass = function ( removals, additions ) {
 
 // *******
 
-function tinyBlocksSave(options, status){
+function tinyBlocksSave(trigger, opt){
   if(typeof tinyBlocksCustomSave == "undefined"){
     if(!$("#tinyBlocksThrobber").length){
       tinyBlocksThrobber(1);
@@ -113,6 +113,21 @@ function tinyBlocksSave(options, status){
         // $(this).html(tinymce.get(tiny).getContent({format:'text'})); //not trustworthy yet
         $(this).attr("markdown", 1);
       });
+      result.find(".tb-tv").each(function(){
+        var thisContent = $(this).html();
+        var thisID = "tv" + $(this).data("tv-id");
+        if($(".galleryXTYPE" + thisID).length){
+          $(".galleryXTYPE" + thisID).attr("id", thisID); //galleryXTYPE not galleryXTYPEtv
+          if($("input.galleryXTYPE" + thisID + "[type=hidden]").length){
+            // Ext.get("galleryXTYPE" + thisID).set({id: thisID});
+            Ext.get(thisID).set({value: thisContent, id: "galleryXTYPE" + thisID});
+          }
+          else{
+            Ext.get(thisID).dom.value = thisContent; // set({value: ...})  will not work here - strange beans!!!
+          }
+          console.log(thisID + "...cause ExtJS 'dom' of null error to prevent MODX from resetting TV data");
+        }
+      }).remove();      
       result.find("[id^=mce_]").removeAttr('id');
       result.find(".tinyBlocksCE, [data-mce-bogus], .mce-shim, .coder").remove();
       result.find('*')
@@ -130,14 +145,14 @@ function tinyBlocksSave(options, status){
         pure.contents().unwrap();
       }
 
-
       var resultContent = result.html().replace(/(?:&amp;gt;|&gt;)/g, ">");
-      if(status){
+      if(trigger == "update"){
+        // for later
         document.getElementById(tinyBlocksMainWrapperId+"_HTML").value = resultContent;
         tinyBlocksThrobber(0);
       }
       else{
-        document.getElementById(tinyBlocksOriginalSourceId).value = resultContent;
+        tinyBlocksSaveUpdateCurrent = document.getElementById(tinyBlocksOriginalSourceId).value = resultContent; // cache and save to #ta for example
         setTimeout(function(){
           tinyBlocksThrobber(0);
           $("#modx-abtn-save").trigger("click");
@@ -148,6 +163,41 @@ function tinyBlocksSave(options, status){
   else{
     tinyBlocksCustomSave();
   }
+}
+function tinyBlocksRestore(opt){
+  tinyBlocksThrobber(1);
+  tinyBlocksToolsMenu();
+  function prepare(content){
+    var tbRWC = $(".tinyBlocksRowsWrapperClass");
+    tbRWC.html(content);
+    tinyBlocksPrepareTLB(tbRWC.find(".tb-wrapper-tlb"));
+    tinyBlocksPrepareAceBlock(tbRWC.find(".tb-tiny-rc"));
+    tinyBlocksTinyMCE();
+    tinyBlocksRawCode();
+    tinyBlocksThrobber(0);
+  }
+  if(opt == "saved"){
+    if(typeof tinyBlocksSaveUpdateCurrent == "undefined"){
+      tinymce.get("tmpTempEditor").windowManager.alert("Nothing Saved Yet");
+    }
+    else{
+      // tinyBlocksClearAll("temp");
+      document.getElementById(tinyBlocksMainWrapperId+"_HTML").value = tinyBlocksSaveUpdateCurrent;
+      prepare(tinyBlocksSaveUpdateCurrent);
+      tinymce.get("tmpTempEditor").windowManager.alert("Restored Last Saved Content");
+    }
+  }
+  else if(opt == "manually"){
+    prepare(document.getElementById(tinyBlocksMainWrapperId+"_HTML").value);
+    tinymce.get("tmpTempEditor").windowManager.alert("Restored From Textarea");
+  }
+  else{
+    // tinyBlocksClearAll("temp");
+    document.getElementById(tinyBlocksMainWrapperId+"_HTML").value = tinyBlocksOriginalContent;
+    prepare(tinyBlocksOriginalContent);
+    tinymce.get("tmpTempEditor").windowManager.alert("Restored Original Content");
+  }
+  tinyBlocksThrobber(0);
 }
 if(typeof autoFileBrowser == "undefined" || autoFileBrowser.name == "modxNativeBrowser"){
   autoFileBrowser = function(field_name, url, type, win, gallery) {
@@ -164,7 +214,7 @@ if(typeof autoFileBrowser == "undefined" || autoFileBrowser.name == "modxNativeB
         "select": {
           fn:function(data) {
             if(gallery == "createGal"){
-              tinymce.get("tinyJSONfield").windowManager.confirm("Use thumbnails for this Gallery View?", function(s){
+              tinymce.get("tinyJSONfield").windowManager.confirm("Use thumbnails in your \"thumb/\" folder for this Gallery View?", function(s){
                 if(s){
                   rebuildGalleryFromMODX(data, ".modx-browser-thumb-wrap", "browser", "on");
                 }
@@ -302,11 +352,19 @@ function tinyBlocksGalleryGetChunk(id){
   });
 }
 function tinyBlocksDefaultGalleryInit(){
-  if($("#tv"+tinyBlocksDefaultGallery).length){
+  if($(".galleryXTYPEtv"+tinyBlocksDefaultGallery).attr("id", "tv"+tinyBlocksDefaultGallery).length){
     popGal("tv"+tinyBlocksDefaultGallery, tinyBlocksProjectName + " Gallery TV");
   }
   else{
     tinymce.get("tmpTempEditor").windowManager.alert("Gallery TV " +tinyBlocksDefaultGallery + " is not currently visibly attached to this Resource");
+  }
+}
+function tinyBlocksBlurAll(origin){
+  $("#"+tinyBlocksMainWrapperId + " [contenteditable]").blur();
+  $("input, textarea, [tabindex]").blur();
+  window.getSelection().removeAllRanges();
+  if(origin == "focus"){
+    document.getElementById(tinyBlocksMainWrapperId).focus();
   }
 }
 function tinyBlocksGalleryTinyJSON(){
@@ -446,11 +504,11 @@ function tinyBlocksToolsMenu(){
   $(".mce-tinyBlocksTools").prependTo("#tinyBlocksControlButtonsWrapper").hide();
   tinyBlocksMouseHoverTraffic = 0;
 }
-function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapperClass){
+function tinyBlocksClearAll(mode, action){
   var tbMain = document.getElementById(tinyBlocksMainWrapperId);
   var tbTHC  = $(tbMain).find(".tinyBlocksRowTempHolderClass");
   var tbTHC_ui  = $(tbMain).find(".tinyBlocksRowTempHolderClass.ui-selected");
-  if(tbTHC.length){
+  if(tbTHC.length || mode){
     var selectedBlocks = "<b>Every</b> Block will be removed";
     if(tbTHC_ui.length){
       selectedBlocks = "<b>"+tbTHC_ui.length+"</b> Selected Block(s) will be removed";
@@ -480,7 +538,8 @@ function tinyBlocksClearAll(mode, mainWrapperId, rowTempHolderClass, rowsWrapper
       }
     };
     if(mode == "temp"){
-      rowAction("yes");
+      rowAction("ok");
+      tinyBlocksRestore(action); // remove all editors before attempting
       return;
     }
     Ext.MessageBox.show({
@@ -530,7 +589,7 @@ function tinyBlocksImport(status) {
         tinyBlocksThrobber(0);
         Ext.MessageBox.show({
           title : "Import Manager",
-          msg : "<p>Copy [[-"+tinyBlocksProjectNameUC+"]] to wherever you want sections</p><br><p>OR Copy [[-"+tinyBlocksProjectNameUC+"-SINGLE]] to anywhere if you do not want sections</p>",
+          msg : "<p><b>Prepare raw UnStructured Content:</b></p><br><p> 2) Copy [[-"+tinyBlocksProjectNameUC+"]] to wherever you want sections</p><br><p> 3) OR Copy [[-"+tinyBlocksProjectNameUC+"-SINGLE]] to anywhere if you do not want sections</p>",
           width : 400,
           buttons : Ext.MessageBox.OK,
         });
@@ -538,7 +597,16 @@ function tinyBlocksImport(status) {
     }, 200);
   }
 }
-function tinyBlocksInsert(event, el) {
+function tinyBlocksInsert(event, el, tv, id, name) {
+  if(tv && $("[data-tv-id="+id+"]").length){
+    var tvPindex = $("[data-tv-id="+id+"]").parents(".tinyBlocksRowTempHolderClass").index() + 1;
+    tinymce.get("tmpTempEditor").windowManager.alert("This TV is already associated with structure #"+tvPindex);
+    return;
+  }
+  if(tv && !$(".galleryXTYPEtv"+id).length){
+    tinymce.get("tmpTempEditor").windowManager.alert("This TV is not currently visibly attached to this Resource");
+    return;
+  }
   var tinyblockssnippet;
   if(event == "shortcut"){
     tinyblockssnippet = el;
@@ -578,7 +646,12 @@ function tinyBlocksInsert(event, el) {
     tlb.alterClass("tb-tiny-*", "").addClass("tb-tiny-" + tinyBlocksPure + " tb-tiny-pure");
   }
   if(event == "click" || event == "shortcut"){
-    if(!activeRow.length){
+    if(!activeRow.length || tv){
+      if(tv){
+        var tvContent = $(".galleryXTYPEtv"+id).val();
+        tlb.attr("data-tv-id", id).addClass("tb-tv").html(tvContent);
+        snippetTpl.addClass("ui-selected").find(".tb-title").attr({"contenteditable": false, "title":"Remote temporary TV editor"}).html("[[*" + name + "]] &nbsp;&nbsp;&nbsp;&nbsp;TV");
+      }
       $(snippetTpl).prependTo(".tinyBlocksRowsWrapperClass");
     }
     else{
@@ -597,22 +670,27 @@ function tinyBlocksInsert(event, el) {
   // tinyBlocksIconPicker();
   tinyBlocksThrobber(0);
 }
-function tinyBlocksQuickInsert(num, destination){
-  num = num - 1;
-  var item = $("#blockSnippetBar").find("[data-tinyblocks-trigger]:eq("+num+")");
-  var itemNext = $("<div>").prepend($("#blockSnippetBar").find("[data-tinyblocks]:eq("+num+")").clone().alterClass("tb-*","").removeClass("tinyBlocksShrinkBlockClass "+tinyBlocksShrinkBlockClass).removeAttr('data-tinyblocks data-tb-title').addClass("tb-mini"));
-  itemNext.find(".tb-mini").children().addClass("mceEditable");
-  itemNext = itemNext.html();
-  if(item.length){
-    if(itemNext && destination == "mini" && tinymce.activeEditor.id !=="tmpTempEditor"){
-      tinymce.activeEditor.focus();
-      tinymce.activeEditor.insertContent(itemNext);
-    }
-    else if(!destination){
-      item.trigger("click");
+function tinyBlocksQuickInsert(num, destination, name){
+  if(name){
+    var nItem = $("#blockSnippetBar").find("[data-tinyblocks-trigger="+name+"]");
+    nItem.trigger("click");
+  }
+  else{
+    num = num - 1;
+    var item = $("#blockSnippetBar").find("[data-tinyblocks-trigger]:eq("+num+")");
+    var itemNext = $("<div>").prepend($("#blockSnippetBar").find("[data-tinyblocks]:eq("+num+")").clone().alterClass("tb-*","").removeClass("tinyBlocksShrinkBlockClass "+tinyBlocksShrinkBlockClass).removeAttr('data-tinyblocks data-tb-title').addClass("tb-mini"));
+    itemNext.find(".tb-mini").children().addClass("mceEditable");
+    itemNext = itemNext.html();
+    if(item.length){
+      if(itemNext && destination == "mini" && tinymce.activeEditor.id !=="tmpTempEditor"){
+        tinymce.activeEditor.focus();
+        tinymce.activeEditor.insertContent(itemNext);
+      }
+      else if(!destination){
+        item.trigger("click");
+      }
     }
   }
-  po = itemNext;
 }
 function tinyBlocksPrepareTLB(el) {
   el.each(function(){
@@ -641,7 +719,7 @@ function tinyBlocksPrepareTLB(el) {
     }
     else{
       if($("#"+tinyBlocksMainWrapperId + " .tb-wrapper-tlb").length > 1){
-        // $(this).addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+        // $(this).addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass"); //experimental - remove default behaviour
       }
     }
     var wrapper = "<div class='tinyBlocksRowTempHolderClass tb-nested-no "+tinyBlocksRowTempHolderClass+"'>" + tempTLB + "</div>";
@@ -704,29 +782,34 @@ function tinyBlocksRawCode() {
 function tinyBlocksDuplicate() {
   var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass");
   if(thisRow){
-    tinyBlocksToolsMenu();
-    if(thisRow.hasClass("tb-nested-no")){
-      $(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
-    }
-    var thisClone = thisRow.clone(true, true);
-    var tlb = thisClone.find(".tb-wrapper-tlb");
-    if(thisRow.hasClass("tb-nested-no")){
-      tlb.prev(".tb-spacer").addClass(tinyBlocksNewBlockClass, tinyBlocksDuplicateBlockClass + " tinyBlocksNewBlockClass tinyBlocksDuplicateBlockClass");
-    }
-    thisClone.find(".tb-tiny-rc-sub").uniqueId().hide().parents(".tb-tiny-rc").addClass("tb-no-ace");
+    if(!thisRow.find("[data-tv-id]").length){
+      tinyBlocksToolsMenu();
+      if(thisRow.hasClass("tb-nested-no")){
+        $(".tb-wrapper-tlb").addClass(tinyBlocksShrinkBlockClass + " tinyBlocksShrinkBlockClass");
+      }
+      var thisClone = thisRow.clone(true, true);
+      var tlb = thisClone.find(".tb-wrapper-tlb");
+      if(thisRow.hasClass("tb-nested-no")){
+        tlb.prev(".tb-spacer").addClass(tinyBlocksNewBlockClass, tinyBlocksDuplicateBlockClass + " tinyBlocksNewBlockClass tinyBlocksDuplicateBlockClass");
+      }
+      thisClone.find(".tb-tiny-rc-sub").uniqueId().hide().parents(".tb-tiny-rc").addClass("tb-no-ace");
 
-    // thisClone.find(".tb-tiny-md, .tb-tiny-md-mini").empty() // if there is trouble with encoding Markdown
-    thisClone.find(".tb-tiny-md").each(function(){
-      var tiny = $(this).attr('id');
-      $(this).html(tinymce.get(tiny).getContent({format:'text'}));
-    });
-    thisClone.find(".ace_wrapper_modx").remove();
-    thisClone.find("*:not(.tb-title)").removeAttr("id contenteditable style").alterClass("mce*","");
-    thisClone.hide().insertAfter(thisRow).fadeIn();
-    tinyBlocksTinyMCE();
-    tinyBlocksRawCode();
-    tinyBlocksLoneOrNoBlock();
-    tinyBlocksThrobber(0);
+      // thisClone.find(".tb-tiny-md, .tb-tiny-md-mini").empty() // if there is trouble with encoding Markdown
+      thisClone.find(".tb-tiny-md").each(function(){
+        var tiny = $(this).attr('id');
+        $(this).html(tinymce.get(tiny).getContent({format:'text'}));
+      });
+      thisClone.find(".ace_wrapper_modx").remove();
+      thisClone.find("*:not(.tb-title)").removeAttr("id contenteditable style").alterClass("mce*","");
+      thisClone.hide().insertAfter(thisRow).fadeIn();
+      tinyBlocksTinyMCE();
+      tinyBlocksRawCode();
+      tinyBlocksLoneOrNoBlock();
+      tinyBlocksThrobber(0);
+    }
+    else{
+      tinymce.get("tmpTempEditor").windowManager.alert("Oops. This is a TV structure");
+    }
   }
 }
 function tinyBlocksDelete(){
@@ -751,6 +834,40 @@ function tinyBlocksDelete(){
     });
   }
 }
+function tinyBlocksInsertTV(id, name){
+  tinyBlocksMouseHoverTraffic = 1;
+  var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass");
+  var thisRowTLB = thisRow.find(".tb-wrapper-tlb");
+  var stIndex = thisRow.index() + 1;
+  var tbTitle = thisRow.find(".tb-title");
+  if($("[data-tv-id="+id+"]").length){ //prevent duplicates
+    var tvPindex = $("[data-tv-id="+id+"]").parents(".tinyBlocksRowTempHolderClass").index() + 1;
+    tinymce.get("tmpTempEditor").windowManager.alert("This TV is already associated with structure #"+tvPindex);
+    return false;
+  }
+  else if(!thisRowTLB.length){
+    tinymce.get("tmpTempEditor").windowManager.alert("Error! No active structure to bind to. Add or hover a structure");
+    return false;
+  }
+  else if(!thisRowTLB.hasClass("mce-content-body")){
+    tinymce.get("tmpTempEditor").windowManager.alert("Error! Supported editors: unnested RTE and MD");
+    return false;
+  }
+  else{
+    if(thisRow.length){
+      tinymce.get("tmpTempEditor").windowManager.confirm("Permanently replace Structure #"+stIndex + " with this TV", function(s){
+        if(s){
+          $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parent(".tinyBlocksRowTempHolderClass").addClass("ui-selected");
+          var tvContent = $(".galleryXTYPEtv"+id).val();
+          thisRowTLB.tinymce().remove();
+          thisRowTLB.attr("data-tv-id", id).addClass("tb-tv").html(tvContent);
+          tinyBlocksTinyMCE();
+          tbTitle.attr({"contenteditable": false, "title":"Remote temporary TV editor"}).html("[[*" + name + "]] &nbsp;&nbsp;&nbsp;&nbsp;TV");
+        }
+      });
+    }
+  }
+}
 function tinyBlocksShortcutJSON(){
   function prepareJSON(js){
     js = js.replace(/\n\s*$/, '').replace(/\n/g, ',');
@@ -760,6 +877,7 @@ function tinyBlocksShortcutJSON(){
   }
   tinyBlocksShortcut = '';
   tinyBlocksTemplateMenu = '';
+  tinyBlocksTvMenu = '';
   $('#blockSnippetBar').find('[data-tinyblocks-trigger]').each(function (index) {
     index = index + 1;
     var title = $(this).attr('data-tinyblocks-trigger');
@@ -779,9 +897,40 @@ function tinyBlocksShortcutJSON(){
     itemNext = itemNext.html();
     tinyBlocksTemplateMenu += '{title: "' + text + '", content: "' + JSON.stringify(itemNext).slice(1, -1) + '"}\n';
   });
+
+
+  tinyBlocksTVs = "gal***" + tinyBlocksDefaultGallery + "," + tinyBlocksTVs;
+  tinyBlocksTVs = tinyBlocksTVs.split(",");
+  var tvindex = 1;
+  $.each(tinyBlocksTVs, function(i, v) {
+    // v0 = tuscan***
+    // v1 = 22
+    // v2 = ***richtext"
+    // tinyBlocksInsert("shortcut", "richtext", "tv", 23, "tuscan4")
+    v = v.split("***");
+    if($("#tv" + v[1]).length){
+      // $("#tv" + v[1]).addClass("galleryXTYPEtv"+v[1]).attr("id", "galleryXTYPEtv"+v[1]); // hmmm!!!!
+      $("#tv" + v[1]).addClass("galleryXTYPEtv"+v[1]);
+      // var tvValue = JSON.stringify($("#tv" + v).val()).slice(1, -1);
+      if(v[1] == tinyBlocksDefaultGallery){
+        $("#tv"+tinyBlocksDefaultGallery + ":visible").addClass("tb-gallery-tv");
+        $(".tb-gallery-tv").parent().addClass("tb-gallery-tv").on("click", tinyBlocksDefaultGalleryInit);
+      }
+      else{
+        if(v[2]){
+          // tinyBlocksTvMenu += '{text: "' + tvindex + ". " + v[0] + '", onclick: function(){tinyBlocksQuickInsert(null, null, \''+v[2]+'\', '+v[1]+')}}\n';
+          tinyBlocksTvMenu += '{text: "' + tvindex + ". " + v[0] + '", onclick: function(){tinyBlocksInsert(\'shortcut\', \''+v[2]+'\', \'tv\', \''+v[1]+'\', \''+v[0]+'\')}}\n';
+        }
+        else{
+          tinyBlocksTvMenu += '{text: "' + tvindex + ". " + v[0] + '*", onclick: function(){tinyBlocksInsertTV('+v[1]+', \''+v[0]+'\')}}\n';
+        }
+        tvindex++;
+      }
+    }
+  });
+  tinyBlocksTvMenu = prepareJSON(tinyBlocksTvMenu);
   tinyBlocksShortcut = prepareJSON(tinyBlocksShortcut);
   tinyBlocksTemplateMenu = prepareJSON(tinyBlocksTemplateMenu);
-
 }
 function tinyBlocksUpAndDown(direction){
   tinyBlocksMouseHoverTraffic = 1;
@@ -872,7 +1021,7 @@ function tinyBlocksKeyBoard(){
           }
         }
         else{
-          $("#modx-header, #modx-action-buttons, #modx-content, #modx-action-buttons, #modx-resource-tabs .x-tab-panel-header.x-tab-panel-header-noborder.x-unselectable.x-tab-panel-header-plain").addClass("tinyBlocksDistraction");
+          $("#modx-header, #modx-action-buttons, #modx-content, #modx-action-buttons, #modx-resource-tabs, #modx-resource-tabs .x-tab-panel-header.x-tab-panel-header-noborder.x-unselectable.x-tab-panel-header-plain, #modx-resource-content > .x-panel-header").addClass("tinyBlocksDistraction");
           if ($('#modx-leftbar:visible').length) {
             $(".x-layout-mini.x-layout-mini-west").trigger("click");
           }
@@ -899,11 +1048,13 @@ function tinyBlocksTempEditorManager(){
 function tinyBlocksLoneOrNoBlock(){
   var loneBlock = $(".tinyBlocksRowsWrapperClass .tinyBlocksRowTempHolderClass");
   if(loneBlock.length < 2){
-    loneBlock.addClass("tb-lone-block");
+    $(".tinyBlocksRowsWrapperClass").addClass("tb-lone-block");
+    loneBlock.addClass("tb-lone-block"); //also hides (in CSS) the block menu - for cleaner look (make sure not to affect functionality)
     // document.styleSheets[0].addRule('.tinyBlocksRowsWrapperClass .tinyBlocksRowTempHolderClass.tb-lone-block:before','display:none;');
   }
   else{
-    loneBlock.removeClass("tb-lone-block");
+    // loneBlock.removeClass("tb-lone-block");
+    $(".tb-lone-block").removeClass("tb-lone-block");
   }
   // if (!$('.tinyBlocksRowsWrapperClass') [0].hasChildNodes()) {
   if (!$('.tinyBlocksRowsWrapperClass').children(".tinyBlocksRowTempHolderClass").length){
@@ -931,22 +1082,27 @@ function tinyBlocksLoneOrNoBlock(){
 function tinyBlocksTitle() {
   var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb");
   var thisTitle = $(".mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-title");
-  var rowAction = function(btn, text) {
-    if(btn == "ok"){
-      if(text){
-        // var text = text.replace(/\s/g, "-").replace(/'|\"/g, "");
-        text = text.replace(/'|\"/g, "");
-        thisRow.attr("data-tb-title", text);
-        thisTitle.text(text);
+  if(!thisRow.data("tv-id")){
+    var rowAction = function(btn, text) {
+      if(btn == "ok"){
+        if(text){
+          // var text = text.replace(/\s/g, "-").replace(/'|\"/g, "");
+          text = text.replace(/'|\"/g, "");
+          thisRow.attr("data-tb-title", text);
+          thisTitle.text(text);
+        }
+        else{
+          thisRow.removeAttr("data-tb-title");
+          thisTitle.text("");
+        }
       }
-      else{
-        thisRow.removeAttr("data-tb-title");
-        thisTitle.text("");
-      }
-    }
-  };
-  Ext.MessageBox.prompt("Title","<span id=tb-alert-title>Special weird Characters are removed</span>",rowAction);
-  $(".ext-mb-input").val(thisRow.attr("data-tb-title"));
+    };
+    Ext.MessageBox.prompt("Title","<span id=tb-alert-title>Special weird Characters are removed</span>",rowAction);
+    $(".ext-mb-input").val(thisRow.attr("data-tb-title"));
+  }
+  else{
+    tinymce.get("tmpTempEditor").windowManager.alert("Oops. This is a TV structure");
+  }
 }
 function tinyBlocksGuide() {
   Ext.MessageBox.show({
@@ -1003,9 +1159,11 @@ function tinyBlocksShowHTML() {
   var tbMainS = $(tbMain).parent();
   if($(tbMainS).is(":hidden")){
     $(tbMainS).fadeIn();
+    document.getElementById(tinyBlocksMainWrapperId).scrollIntoView();
   }
   else{
     $(tbMainS).fadeOut();
+    tinyBlocksBlurAll();
   }
 }
 function tinyBlocksCountAll(){
@@ -1019,7 +1177,7 @@ function tinyBlocksCountAll(){
 // *******
 
 //begin
-function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, rowsWrapperClass, newBlockClass, hiddenBlockClass, duplicateBlockClass, shrinkClass, saveButtonTpl, importWrapper, importMarker, defaultBlock, defaultGallery, thisPageUrl, tinymceSkinUrl, pure, help, randomTip, projectName) {
+function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, rowsWrapperClass, newBlockClass, hiddenBlockClass, duplicateBlockClass, shrinkClass, saveButtonTpl, importWrapper, importMarker, defaultBlock, defaultGallery, tvs, thisPageUrl, tinymceSkinUrl, pure, help, randomTip, projectName) {
   if(typeof tinyBlocksItems == "undefined"){
     tinyBlocksItems = {};
   }
@@ -1038,6 +1196,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
   tinyBlocksImportWrapper = tinyBlocksItems.importWrapper || importWrapper;
   tinyBlocksImportMarker = tinyBlocksItems.importMarker || importMarker;
   tinyBlocksDefaultBlock = tinyBlocksItems.defaultBlock || defaultBlock || "";
+  tinyBlocksTVs = tinyBlocksItems.TVs || tvs || "";
   tinyBlocksDefaultGallery = tinyBlocksItems.defaultGallery || defaultGallery || "";
   tinyBlocksPure = tinyBlocksItems.pure || pure;
   tinyBlocksHelp = tinyBlocksItems.help || help;
@@ -1047,16 +1206,18 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
   tinyBlocksProjectName = tinyBlocksItems.projectName || projectName;
   tinyBlocksProjectNameUC = tinyBlocksProjectName.toUpperCase();
   tinyBlocksProjectNameLC = tinyBlocksProjectName.toLowerCase();
+  tinyBlocksOriginalContent = document.getElementById("ta").value;
 
   if(tinyBlocksOriginalSourceId && tinyBlocksMainWrapperId && tinyBlocksRowClass && tinyBlocksRowTempHolderClass && tinyBlocksRowsWrapperClass){
     tinyBlocksThrobber(1);
-    $("."+tinyBlocksRowsWrapperClass).addClass("tinyBlocksRowsWrapperClass");
+
+    $("."+tinyBlocksRowsWrapperClass).addClass("tinyBlocksRowsWrapperClass").parents(".x-panel-body.main-wrapper").addClass("tb-modx-main-wrapper").css("width", function(i){return $(this).width() + 30;});
 
     $("<div id=tinyBlocksControlButtonsWrapper></div><div id=tinyBlocksBubbleBar></div>").prependTo("body");
 
     tinyBlocksTempEditorManager();
 
-    $("#" + tinyBlocksMainWrapperId).prepend("<div class='tinyBlocksHTMLwrapper' style=display:none><div id='"+tinyBlocksMainWrapperId+"_HTML_btn' class='tinyBlocksHTMLbtn'></div><textarea id='"+tinyBlocksMainWrapperId+"_HTML' class='tinyBlocksHTML'></textarea></div>");
+    $("#" + tinyBlocksMainWrapperId).prepend("<div class='tinyBlocksHTMLwrapper' style=display:none><textarea id='"+tinyBlocksMainWrapperId+"_HTML' class='tinyBlocksHTML'></textarea><div id='"+tinyBlocksMainWrapperId+"_HTML_btn' class='tinyBlocksHTMLbtn'></div></div>");
     $("#"+tinyBlocksMainWrapperId+"_HTML").val($("#"+tinyBlocksOriginalSourceId).val());
 
     tinyBlocksKeyBoard();
@@ -1077,16 +1238,40 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
       }
     });
 
-    if(tinyBlocksDefaultGallery){
-      if($("#tv"+tinyBlocksDefaultGallery).length){
-        $("#tv"+tinyBlocksDefaultGallery + ":visible").addClass("tb-gallery-tv");
-        $(".tb-gallery-tv").parent().addClass("tb-gallery-tv").attr("data-tb-tv", tinyBlocksDefaultGallery).on("click", function(){
-        popGal("tv"+tinyBlocksDefaultGallery, tinyBlocksProjectName + " Gallery TV");
-        });
-      }
-    }
-
     tinyBlocksMouseHoverTraffic = 0;
+    tinymce.ui.Factory.create({
+      type: "button",
+      text: "HTML",
+      style: "margin-right:1em",
+      onclick: function(){
+        tinyBlocksSave("update");
+      }
+    }).renderTo(document.getElementById(tinyBlocksMainWrapperId+"_HTML_btn"));
+    tinymce.ui.Factory.create({
+      type: "menubutton",
+      text: "Restore ",
+      style: "margin-right:1em",
+      classes:"tinyBlocksHTMLTools",
+      menu: [{
+        text: "Original Content",
+        onclick: function(){
+          // tinyBlocksRestore();
+          tinyBlocksClearAll("temp", null);
+        }
+      }, {
+        text: "Last Saved Content",
+        onclick: function(){
+          tinyBlocksClearAll("temp", "saved");
+          // tinyBlocksRestore("saved");
+        }
+      }, {
+        text: "Manually from Textarea",
+        onclick: function(){
+          tinyBlocksClearAll("temp", "manually");
+          // tinyBlocksRestore("saved");
+        }
+      }]
+    }).renderTo(document.getElementById(tinyBlocksMainWrapperId+"_HTML_btn"));
     tinymce.ui.Factory.create({
       type: "button",
       text:"Import (i + m) ",
@@ -1096,84 +1281,105 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
       //   tinymce.DOM.loadCSS(tinyBlocksTinymceSkinUrl+'/skin.min.css'); //dubious
       // },
     }).renderTo(document.getElementById(tinyBlocksMainWrapperId+"_HTML_btn"));
-    tinymce.ui.Factory.create({
-      type: "menubutton",
-      // text: tinyBlocksProjectName.substring(0,2),
-      text: tinyBlocksProjectName,
-      classes: "tinyBlocksButton",
-      icon: "table",
-      tooltip: tinyBlocksProjectName + " Content Manager Main Menu",
-      hidden:true,
-      autohide:true,
-      onPostRender: function(){
-        if(tinyBlocksRandomTip){
-          $("#tb-random-tip").text(tinyBlocksRandomTip).delay(1400).fadeIn("slow");
-        }
-        $("#tinyBlocksButtonHolder, .mce-tinyBlocksButton").delay(1400).fadeIn("slow");
-      },
-      menu:[
-        {
-          text: "Gallery Manager",
-          classes:"tb-gallery",
-          menu: [
-          {
-            text: "Main Gallery For this Document (g + t)",
-            classes:"tb-tv-gallery",
-            onclick: tinyBlocksDefaultGalleryInit
-          },
-          {
-            text: "Gallery for Current Row/Block (g + 1)",
-            classes:"tb-o-gallery",
-            onclick: tinyBlocksGalleryTinyJSON,
-          },
-          {
-            text: "Toggle Global Gallery (g + g)",
-            classes:"tb-gallery",
-            onclick: tinyBlocksGallery,
-          },
-          ]
-        },
-        {
-          text: "Delete All Rows (del + a)",
-          onclick: tinyBlocksClearAll
-        },
-        {
-          text: "Quick Insert (1 - 9)",
-          menu: tinyBlocksShortcut,
-          classes: "quickInsert",
-          onPostRender: function(){
-            if(!tinyBlocksShortcut.length){
-              $(".mce-quickInsert").remove();
-            }
+    if($("#tinyBlocksTVButtonHolder").length && tinyBlocksTvMenu.length){
+      tinymce.ui.Factory.create({
+        type: "menubutton",
+        text: "TVs",
+        classes: "tinyBlocksButton",
+        autohide:true,
+        menu: tinyBlocksTvMenu
+      }).renderTo(document.getElementById("tinyBlocksTVButtonHolder"));
+    }
+    if($("#tinyBlocksButtonHolder").length){
+      tinymce.ui.Factory.create({
+        type: "menubutton",
+        // text: tinyBlocksProjectName.substring(0,2),
+        text: tinyBlocksProjectName,
+        classes: "tinyBlocksButton",
+        icon: "table",
+        tooltip: "Content Manager",
+        hidden:true,
+        autohide:true,
+        onPostRender: function(){
+          if(tinyBlocksRandomTip){
+            $("#tb-random-tip").text(tinyBlocksRandomTip).delay(1400).fadeIn("slow");
           }
+          $("#tinyBlocksButtonHolder, .mce-tinyBlocksButton").delay(1400).fadeIn("slow");
         },
-        {
-          text: "Source / Import / Debug, Etc ...",
-          menu: [ {
-            text: "Source / Import (s)",
-            onclick: tinyBlocksShowHTML
+        menu:[
+          {
+            text: "Gallery Manager",
+            classes:"tb-gallery",
+            menu: [
+            {
+              text: "Main Gallery For this Document (g + t)",
+              classes:"tb-tv-gallery",
+              onclick: tinyBlocksDefaultGalleryInit
+            },
+            {
+              text: "Gallery for Current Row/Block (g + 1)",
+              classes:"tb-o-gallery",
+              onclick: tinyBlocksGalleryTinyJSON,
+            },
+            {
+              text: "Toggle Global Gallery (g + g)",
+              classes:"tb-gallery",
+              onclick: tinyBlocksGallery,
+            },
+            ]
           },
           {
-            text: "Debug Info (b)",
-            classes:"debug",
-            tooltip : "appears in "+tinyBlocksProjectName+" sidebar",
-            onclick: tinyBlocksDebug
+            text: "Delete All Rows (del + a)",
+            onclick: tinyBlocksClearAll
           },
           {
-            text: "Disable " + tinyBlocksProjectName + " (d)",
-            classes:"disable",
-            onclick: tinyBlocksDisable
-          },{
-            text: "About",
-            onclick: function(){
-              tinymce.get("tmpTempEditor").windowManager.alert(tinyBlocksProjectName + " 3.0-beta1; tinyBlocks.js-beta3; by donShakespeare 2016");
+            text: "Quick Insert (1 - 9)",
+            menu: tinyBlocksShortcut,
+            classes: "quickInsert",
+            onPostRender: function(){
+              if(!tinyBlocksShortcut.length){
+                $(".mce-quickInsert").remove();
+              }
             }
+          },
+          {
+            text: "Template Variables",
+            classes: "tb-block-shortcut attachTv",
+            menu: tinyBlocksTvMenu,
+            onPostRender: function(){
+              if(!tinyBlocksTvMenu.length){
+                $(".mce-attachTv").remove();
+              }
+            }
+          },
+          {
+            text: "Restore / Import ...",
+            menu: [ {
+              text: "Restore / Import (s)",
+              onclick: tinyBlocksShowHTML
+            },
+            {
+              text: "Debug Info (b)",
+              classes:"debug",
+              tooltip : "appears in "+tinyBlocksProjectName+" sidebar",
+              onclick: tinyBlocksDebug
+            },
+            {
+              text: "Disable " + tinyBlocksProjectName + " (d)",
+              classes:"disable",
+              onclick: tinyBlocksDisable
+            },{
+              text: "About",
+              onclick: function(){
+                tinymce.get("tmpTempEditor").windowManager.alert(tinyBlocksProjectName + " 3.0.1-beta1; tinyBlocks.js; by donShakespeare 2016");
+              }
+            }]
+          },{
+            text: "Help (h)",
+            onclick: tinyBlocksGuide
           }]
-        },{
-          text: "Help (h)",
-          onclick: tinyBlocksGuide
-        }]
-    }).renderTo(document.getElementById("tinyBlocksButtonHolder"));
+      }).renderTo(document.getElementById("tinyBlocksButtonHolder"));
+    }
     tinymce.ui.Factory.create({
       type: "menubutton",
       hidden: true,
@@ -1184,6 +1390,9 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         tinyBlocksRawCode();
         tinyBlocksThrobber(0);
         tinyBlocksGallery("begin");
+        setTimeout(function(){
+          tinyBlocksBlurAll();
+        },500);
         // $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowsWrapperClass, .tb-nested-wrapper") // it i spointles, inconvenient and cumbersome to have drag n drop for nested blocks, seriously!
         $("#" + tinyBlocksMainWrapperId + " .tinyBlocksRowsWrapperClass")
         .sortable({
@@ -1206,7 +1415,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
               // tinyBlocksToolsMenu();
               $("body").addClass('ui-drag');
               visibleLi  = $('.tinyBlocksRowTempHolderClass.ui-selected').length;
-              visibleSelected  = $("#" + tinyBlocksMainWrapperId + " .ui-selected:visible").length;
+              visibleSelected  = $("#" + tinyBlocksMainWrapperId + " .ui-selected.tb-nested-no:visible").length;
               if(visibleSelected > 1){
                 ui.item.siblings(".ui-selected").addClass("tinyBlocksEnRouteSibling");
                 $(".tinyBlocksEnRouteSibling:not(.tb-ui-multiple-select)").hide().wrapAll("<div class='tinyBlocksTempUI' style='display:none' />");
@@ -1258,7 +1467,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
               // console.log("TinyBlocks.js completed jQuery UI multiple Select/Sortable");
             },
             revert: "invalid",
-            revertDuration: 50,
+            revertDuration: 30,
             // revert: false,
             receive: function(event, ui) {
               tinyBlocksInsert("drag", $(ui.item));
@@ -1267,10 +1476,13 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         .css("position","relative")
         .selectable({
           // filter: ".tinyBlocksRowTempHolderClass, tb-nested-wrapper [class^=tb-tiny-]",
-          filter: ".tinyBlocksRowTempHolderClass",
-          cancel: ".tb-guide,.tinyBlocksRowTempHolderClass > *", //covers external Inline Ace plugin
+          filter: ".tinyBlocksRowTempHolderClass.tb-nested-no", // disable nested drag-to-select : user can still click to select each or delete parent block
+          cancel: ".tb-guide,.tinyBlocksRowTempHolderClass > *, .tb-nested-yes", //covers external Inline Ace plugin
           // cancel: ".tb-guide,.tinyBlocksRowTempHolderClass.tb-nested-no > *:not(.tb-nested-wrapper)",
           // cancel: ".tb-wrapper-tlb, .tb-title-spacer, .tb-ui-drag-handle, .mce-tinyBlocksTools"
+          start: function() {
+            tinyBlocksBlurAll();
+          }
         });
 
         $("[data-tinyblocks-trigger]")
@@ -1315,7 +1527,6 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
       },
       menu:[
         {
-          icon: false,
           text: "Duplicate (c)",
           classes:"tb-duplicate",
           onclick: tinyBlocksDuplicate,
@@ -1324,13 +1535,11 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
           }
         },
         {
-          icon: false,
           text: "Delete (del + 1)",
           classes:"tb-trash",
           onclick: tinyBlocksDelete
         },
         {
-          icon: false,
           text: "Resize (all: -/+)",
           classes:"tb-enlarge",
           onclick: function() {
@@ -1344,25 +1553,32 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
           }
         },
         {
-          icon: false,
           text: "Add/edit Title (t)",
           classes:"tb-title-spacer",
           onclick: tinyBlocksTitle
         },
         {
-          icon: false,
           text: "Gallery (g + 1)",
           classes: "tb-block-gallery",
           onclick: tinyBlocksGalleryTinyJSON
         },
         {
-          icon: false,
           text: "Quick Insert (1-9)",
           classes: "tb-block-shortcut quickInsert",
           menu: tinyBlocksShortcut,
           onPostRender: function(){
             if(!tinyBlocksShortcut.length){
               $(".mce-quickInsert").remove();
+            }
+          }
+        },
+        {
+          text: "Template Variables",
+          classes: "tb-block-shortcut attachTv",
+          menu: tinyBlocksTvMenu,
+          onPostRender: function(){
+            if(!tinyBlocksTvMenu.length){
+              $(".mce-attachTv").remove();
             }
           }
         }
@@ -1382,6 +1598,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         else{
           par.addClass("ui-selected");
         }
+        tinyBlocksBlurAll();
       }
     });
     $("#"+tinyBlocksMainWrapperId).on("dblclick", ".tb-select", function(){
@@ -1393,8 +1610,10 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         else{
           par.addClass("ui-selected");
         }
+        tinyBlocksBlurAll();
       }
     });
+
     $("#"+tinyBlocksMainWrapperId).on("click", ".tb-wrapper-tlb, [class^=tb-tiny-]", function(){
       tinyBlocksMouseHoverTraffic = 0;
       var $this = $(this);
@@ -1405,7 +1624,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
     });
     // $("#"+tinyBlocksMainWrapperId).on("mouseenter click", ".tinyBlocksRowsWrapperClass .tinyBlocksRowTempHolderClass:not(.tb-nested)", function(){
     $("#"+tinyBlocksMainWrapperId).on("mouseenter click", ".tinyBlocksRowTempHolderClass", function(){
-      if(tinyBlocksMouseHoverTraffic === 0 && !$(".mce-tinyBlocksTools-menu:visible").length){
+      if(tinyBlocksMouseHoverTraffic === 0 && !$(".mce-tinyBlocksTools-menu:visible").length){ //prevent block menu from jumping around
         $(".mce-tinyBlocksTools").prependTo($(this)).show();
         $(".tinyBlocksActive").removeClass("tinyBlocksActive");
         $(this).addClass("tinyBlocksActive");
@@ -1425,8 +1644,7 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
     // $("#"+tinyBlocksMainWrapperId).on("keyup",function(e){
     $(document).on("keyup",function(e){
       if(e.keyCode == 27){
-        $("#"+tinyBlocksMainWrapperId + " [contenteditable]").blur();
-        window.getSelection().removeAllRanges();
+        tinyBlocksBlurAll("focus");
       }
     });
   }
