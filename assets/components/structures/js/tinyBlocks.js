@@ -504,7 +504,7 @@ function tinyBlocksToolsMenu(){
   $(".mce-tinyBlocksTools").prependTo("#tinyBlocksControlButtonsWrapper").hide();
   tinyBlocksMouseHoverTraffic = 0;
 }
-function tinyBlocksClearAll(mode, action){
+function tinyBlocksClearAll(mode, action, restore){
   var tbMain = document.getElementById(tinyBlocksMainWrapperId);
   var tbTHC  = $(tbMain).find(".tinyBlocksRowTempHolderClass");
   var tbTHC_ui  = $(tbMain).find(".tinyBlocksRowTempHolderClass.ui-selected");
@@ -538,8 +538,17 @@ function tinyBlocksClearAll(mode, action){
       }
     };
     if(mode == "temp"){
-      rowAction("ok");
-      tinyBlocksRestore(action); // remove all editors before attempting
+      if(restore && tinyBlocksPure){
+        tinyBlocksThrobber(0);
+        MODx.msg.alert("Pure Content!", "You are currently in '"+tinyBlocksPure+"' mode");
+        return;
+      }
+      else{
+        rowAction("ok");
+        if(restore){
+          tinyBlocksRestore(action); // remove all editors before attempting
+        }
+      }
       return;
     }
     Ext.MessageBox.show({
@@ -742,6 +751,9 @@ function tinyBlocksPrepareTLB(el) {
       }),
       $('<div class=tb-spacer><div class=tb-name title=Type></div><div class=tb-title title="Edit Title" contenteditable=true>'+text+'</div></div>')
     );
+    if(tinyBlocksPure){
+      $(this).parents(".tinyBlocksRowTempHolderClass").find(".tb-title").remove();
+    }
   });
 }
 function tinyBlocksPrepareAceBlock(el) {
@@ -1082,7 +1094,7 @@ function tinyBlocksLoneOrNoBlock(){
 function tinyBlocksTitle() {
   var thisRow = $("#"+tinyBlocksMainWrapperId + " .mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-wrapper-tlb");
   var thisTitle = $(".mce-tinyBlocksTools").parents(".tinyBlocksRowTempHolderClass").find(".tb-title");
-  if(!thisRow.data("tv-id")){
+  if(!thisRow.data("tv-id") && !tinyBlocksPure){
     var rowAction = function(btn, text) {
       if(btn == "ok"){
         if(text){
@@ -1101,7 +1113,7 @@ function tinyBlocksTitle() {
     $(".ext-mb-input").val(thisRow.attr("data-tb-title"));
   }
   else{
-    tinymce.get("tmpTempEditor").windowManager.alert("Oops. This is a TV structure");
+    // tinymce.get("tmpTempEditor").windowManager.alert("Oops. This is a TV structure");
   }
 }
 function tinyBlocksGuide() {
@@ -1256,18 +1268,18 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         text: "Original Content",
         onclick: function(){
           // tinyBlocksRestore();
-          tinyBlocksClearAll("temp", null);
+          tinyBlocksClearAll("temp", null, "restore");
         }
       }, {
         text: "Last Saved Content",
         onclick: function(){
-          tinyBlocksClearAll("temp", "saved");
+          tinyBlocksClearAll("temp", "saved", "restore");
           // tinyBlocksRestore("saved");
         }
       }, {
         text: "Manually from Textarea",
         onclick: function(){
-          tinyBlocksClearAll("temp", "manually");
+          tinyBlocksClearAll("temp", "manually", "restore");
           // tinyBlocksRestore("saved");
         }
       }]
@@ -1287,6 +1299,12 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         text: "TVs",
         classes: "tinyBlocksButton",
         autohide:true,
+        onPostRender: function(){
+          if(tinyBlocksRandomTip && !$("#tb-random-tip").hasClass("tb-active-tip")){
+            $("#tb-random-tip").addClass("tb-active-tip").text(tinyBlocksRandomTip).delay(1400).fadeIn("slow");
+          }
+          $(".mce-tinyBlocksButton").delay(1400).fadeIn("slow");
+        },
         menu: tinyBlocksTvMenu
       }).renderTo(document.getElementById("tinyBlocksTVButtonHolder"));
     }
@@ -1301,10 +1319,10 @@ function tinyBlocks(sourceFeed, originalSourceId, rowClass, rowTempHolderClass, 
         hidden:true,
         autohide:true,
         onPostRender: function(){
-          if(tinyBlocksRandomTip){
-            $("#tb-random-tip").text(tinyBlocksRandomTip).delay(1400).fadeIn("slow");
+          if(tinyBlocksRandomTip && !$("#tb-random-tip").hasClass("tb-active-tip")){
+            $("#tb-random-tip").addClass("tb-active-tip").text(tinyBlocksRandomTip).delay(1400).fadeIn("slow");
           }
-          $("#tinyBlocksButtonHolder, .mce-tinyBlocksButton").delay(1400).fadeIn("slow");
+          $(".mce-tinyBlocksButton").delay(1400).fadeIn("slow");
         },
         menu:[
           {

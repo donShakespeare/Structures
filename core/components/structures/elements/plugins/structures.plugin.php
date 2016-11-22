@@ -133,7 +133,7 @@ if ($id !== 0){
         $sidebar_tab_title = $modx->getOption("sidebar_tab_title", $getVariousSettings, $cognomen);
         $content_tab_title = $modx->getOption("content_tab_title", $getVariousSettings, $cognomen);
         $manager_css = $modx->getOption("manager_css", $getVariousSettings, $pluginMGRcss);
-        $tinymce_skin_url = $modx->getOption("tinymce_skin_url", $getVariousSettings, $pluginSkinUrl);
+        $TinyMCE_skin_url = $modx->getOption("TinyMCE_skin_url", $getVariousSettings, $pluginSkinUrl);
         $donshakepeare_tinymce_js_plugins = $modx->getOption("donshakepeare_tinymce_js_plugins", $getVariousSettings);
         $manager_js = $modx->getOption("manager_js", $getVariousSettings);
         $tinymce_init_chunk = $modx->getOption("tinymce_init_chunk", $getVariousSettings);
@@ -203,7 +203,7 @@ if ($id !== 0){
         <span><b>manager_css</b><i>". $manager_css . "</i></span>
         <span><b>CDN_Ace</b><i>". $CDN_Ace . "</i></span>
         <span><b>donshakepeare_tinymce_js_plugins</b><i>". $donshakepeare_tinymce_js_plugins . "</i></span>
-        <span><b>tinymce_skin_url</b><i>". $tinymce_skin_url . "</i></span>
+        <span><b>TinyMCE_skin_url</b><i>". $TinyMCE_skin_url . "</i></span>
         <span class='imp'><b>tinymce_init_chunk</b><i>". $tinymce_init_chunk . "</i></span>
         <span><b>ace_mirror_init_chunk</b><i>". $ace_mirror_init_chunk . "</i></span>
         <span><b>all_structures_chunk</b><i>". $all_structures_chunk . "</i></span>
@@ -239,7 +239,7 @@ if ($id !== 0){
 
         $blockTinyMCEConfig = $modx->getChunk($tinymce_init_chunk, array(
           "tinyBlocksMainWrapperId" => "#tinyBlocksMainWrapperId_".$originalSourceId,
-          "tinyBlocksSkinUrl" => $tinymce_skin_url
+          "tinyBlocksSkinUrl" => $TinyMCE_skin_url
         ));
         $blockAceOrCMConfig = $modx->getChunk($ace_mirror_init_chunk);
         if($blockSnippetBar = $modx->getObject("modChunk", array('name' => $all_structures_chunk))){
@@ -383,7 +383,7 @@ if ($id !== 0){
               "importWrapper": '.json_encode($importWrapperJS).',
               "importMarker": '.json_encode($import_marker_chunk).',
               "defaultBlock": '.json_encode($standByStructure).',
-              "tinymceSkinUrl":  "'.$tinymce_skin_url.'",
+              "tinymceSkinUrl":  "'.$TinyMCE_skin_url.'",
               "thisPageUrl":  "'.MODX_MANAGER_URL.'?a=resource/update&id='.$id.'",
               "randomTip":  '.json_encode($randomTip[0]).',
               "defaultGallery":  "'.$defaultGalleryTVid.'",
@@ -395,7 +395,7 @@ if ($id !== 0){
             TinyJSONGalleryDefaultTV = "'.$defaultGalleryTVid.'";
             TinyJSONGalleryBase = "'.MODX_BASE_URL.'";
             TinyJSONGalleryGallery = "'.MODX_ASSETS_URL.'components/structures/gallery/";
-            TinyJSONGalleryGallerySkin = "'.$tinymce_skin_url.'";
+            TinyJSONGalleryGallerySkin = "'.$TinyMCE_skin_url.'";
             function tinyBlocksTinyMCE(){
               '.$blockTinyMCEConfig.'
             }
